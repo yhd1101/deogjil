@@ -11,6 +11,13 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
+  async CreateUser(createUserDto: CreateUserDto) {
+    const newSignup = await this.userRepository.create(createUserDto);
+    // newSignup.provider = Provider.LOCAL;
+    await this.userRepository.save(newSignup);
+    return newSignup;
+  }
+
   //user찾기 (by id)
   async getUserById(id: string) {
     const user = await this.userRepository.findOneBy({ id });

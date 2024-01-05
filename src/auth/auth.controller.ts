@@ -32,7 +32,7 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   async kakaoLoginCallBack(@Req() req: any): Promise<any> {
     const { user } = req;
-
-    return user;
+    const token = await this.authService.generateAccessToken(user.id);
+    return { token, user };
   }
 }
