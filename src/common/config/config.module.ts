@@ -11,6 +11,12 @@ import * as Joi from '@hapi/joi';
         POSTGRES_USERNAME: Joi.string().required(),
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
+
+        ACCESSTOKEN_SECRET_KEY: Joi.string().required(),
+        ACCESSTOKEN_EXPIRATION_TIME: Joi.number().required(),
+
+        KAKAO_AUTH_CLIENTID: Joi.string().required(),
+        KAKAO_AUTH_CALLBACK_URL: Joi.string().required(),
       }),
     }),
   ],
