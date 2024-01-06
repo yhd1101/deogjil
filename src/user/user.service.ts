@@ -26,4 +26,13 @@ export class UserService {
     }
     return user;
   }
+
+  //email로 찾기
+  async getUserByEmail(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException('No user Email');
+    }
+    return user;
+  }
 }

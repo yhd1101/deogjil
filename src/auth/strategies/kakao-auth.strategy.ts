@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-kakao';
 import { Provider } from '../../user/entities/provider.enum';
@@ -26,7 +26,6 @@ export class KakaoAuthStrategy extends PassportStrategy(
     profile: any,
     done: any,
   ): Promise<any> {
-    done(null, profile);
     const { displayName, provider } = profile;
     const { profile_image } = profile._json.properties;
     const { email } = profile._json.kakao_account;
@@ -37,32 +36,25 @@ export class KakaoAuthStrategy extends PassportStrategy(
       picture: profile_image,
     };
     console.log(userInput);
-    const newUser = await this.userService.CreateUser({
-      email,
-      name: displayName,
-      provider,
-      profileImg: profile_image,
-    });
-    done(null, newUser);
-    // try {
-    //   const user = await this.userService.getUserByEmail(email);
-    //   if (user.provider !== provider) {
-    //     throw new HttpException(
-    //       `You are already subscribed to ${user.provider}`,
-    //       HttpStatus.CONFLICT,
-    //     );
-    //   }
-    //   done(null, user);
-    // } catch (err) {
-    //   if (err.status === 404) {
-    //     const newUser = await this.userService.CreateUser({
-    //       email,
-    //       name: displayName,
-    //       provider,
-    //       profileImg: profile_image,
-    //     });
-    //     done(null, newUser);
-    //   }
-    // }
+    try {
+      const user = await this.userService.getUserByEmail(email);
+      if (user.provider !== provider) {
+        throw new HttpException(
+          `You are already subscribed to ${user.provider}`,
+          HttpStatus.CONFLICT,
+        );
+      }
+      done(null, user);
+    } catch (err) {
+      if (err.status === 404) {
+        const newUser = await this.userService.CreateUser({
+          email,
+          name: displayName,
+          provider,
+          profileImg: profile_image,
+        });
+        done(null, newUser);
+      }
+    }
   }
 }

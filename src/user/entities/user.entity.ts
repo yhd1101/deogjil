@@ -1,8 +1,9 @@
-import { BeforeInsert, Column, Entity } from 'typeorm';
+import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 import { CommonEntity } from '../../common/entities/common.entity';
 import { Provider } from './provider.enum';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as gravatar from 'gravatar';
+import { Content } from '../../contents/entities/content.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -21,6 +22,9 @@ export class User extends CommonEntity {
 
   @Column({ nullable: true })
   public profileImg?: string;
+
+  @OneToMany(() => Content, (content: Content) => content.writer)
+  public content: Content[];
 
   @BeforeInsert()
   async beforeSaveFunction(): Promise<void> {
