@@ -26,19 +26,42 @@ export class ContentsService {
     return newContent;
   }
 
-  async contentGetAll(pageOptionsDto: PageOptionsDto) {
-    const queryBuilder = this.contentRepository.createQueryBuilder('content');
-    queryBuilder.leftJoinAndSelect('content.writer', 'writer'); // 관계형
+  // async contentGetAll(page: number = 1) {
+  //   const take = 1;
+  //   const queryBuilder = this.contentRepository.createQueryBuilder('content');
+  //   queryBuilder.leftJoinAndSelect('content.writer', 'writer'); // 관계형
+  //
+  //   queryBuilder
+  //     .orderBy('content.createdAt', pageOptionsDto.order)
+  //     .skip(pageOptionsDto.skip)
+  //     .take(pageOptionsDto.take);
+  //
+  //   const itemCount = await queryBuilder.getCount();
+  //   const { entities } = await queryBuilder.getRawAndEntities();
+  //
+  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+  //   return new PageDto(entities, pageMetaDto);
+  // }
 
-    queryBuilder
-      .orderBy('content.createdAt', pageOptionsDto.order)
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take);
+  async contentGetAll(page: number = 1): Promise<any> {
+    const take = 8;
 
-    const itemCount = await queryBuilder.getCount();
-    const { entities } = await queryBuilder.getRawAndEntities();
+    const [contents, itemCount] = await this.contentRepository.findAndCount({
+      take,
+      skip: (page - 1) * take,
+      relations: ['writer'], // Assuming 'writer' is the relation in your Content entity
+      order: { createdAt: 'ASC' }, // Adjust the order as per your requirements
+    });
 
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-    return new PageDto(entities, pageMetaDto);
+    return {
+      data: contents,
+      meta: {
+        itemCount,
+        page,
+        pageCount: Math.ceil(itemCount / take),
+        hasPreviousPage: page > 1,
+        hasNextPage: page < Math.ceil(itemCount / take),
+      },
+    };
   }
 }

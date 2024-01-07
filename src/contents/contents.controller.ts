@@ -53,7 +53,7 @@ export class ContentsController {
 
   @Get()
   @ApiOperation({ summary: '글전체목록', description: '전체 글 조회' })
-  async getAllContent(@Query() pageOptionsDto: PageOptionsDto) {
-    return await this.contentsService.contentGetAll(pageOptionsDto);
+  async getAllContent(@Query('page') page: number) {
+    return await this.contentsService.contentGetAll(page);
   }
 }
