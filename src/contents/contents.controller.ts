@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
@@ -21,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
 
 @ApiTags('Content')
 @Controller('content')
@@ -51,7 +53,7 @@ export class ContentsController {
 
   @Get()
   @ApiOperation({ summary: '글전체목록', description: '전체 글 조회' })
-  async getAllContent() {
-    return await this.contentsService.contentGetAll();
+  async getAllContent(@Query() pageOptionsDto: PageOptionsDto) {
+    return await this.contentsService.contentGetAll(pageOptionsDto);
   }
 }

@@ -5,6 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Content } from './entities/content.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageMetaDto } from '../common/dtos/page-meta.dto';
+import { PageDto } from '../common/dtos/page.dto';
 
 @Injectable()
 export class ContentsService {
@@ -23,12 +26,19 @@ export class ContentsService {
     return newContent;
   }
 
-  async contentGetAll() {
-    //?옵션 있어도그만없어도그만
-    const queryBuilder =
-      await this.contentRepository.createQueryBuilder('contents'); //db에 쿼리를직접 해줌
-    queryBuilder.leftJoinAndSelect('contents.writer', 'writer'); //관계형
+  async contentGetAll(pageOptionsDto: PageOptionsDto) {
+    const queryBuilder = this.contentRepository.createQueryBuilder('content');
+    queryBuilder.leftJoinAndSelect('content.writer', 'writer'); // 관계형
+
+    queryBuilder
+      .orderBy('content.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take);
+
+    const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
-    return entities;
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
   }
 }

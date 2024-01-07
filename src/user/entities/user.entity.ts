@@ -26,18 +26,18 @@ export class User extends CommonEntity {
   @OneToMany(() => Content, (content: Content) => content.writer)
   public content: Content[];
 
-  @BeforeInsert()
-  async beforeSaveFunction(): Promise<void> {
-    try {
-      this.profileImg = await gravatar.url(this.email, {
-        s: '200',
-        r: 'pg',
-        d: 'mm',
-        protocol: 'https',
-      });
-    } catch (err) {
-      console.log(err);
-      throw new InternalServerErrorException();
-    }
-  }
+  // @BeforeInsert()
+  // async beforeSaveFunction(): Promise<void> {
+  //   try {
+  //     this.profileImg = await gravatar.url(this.email, {
+  //       s: '200',
+  //       r: 'pg',
+  //       d: 'mm',
+  //       protocol: 'https',
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw new InternalServerErrorException();
+  //   }
+  // }
 }

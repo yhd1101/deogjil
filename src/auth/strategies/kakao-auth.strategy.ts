@@ -33,7 +33,7 @@ export class KakaoAuthStrategy extends PassportStrategy(
       name: displayName,
       email,
       provider,
-      picture: profile_image,
+      profileImg: profile_image,
     };
     console.log(userInput);
     try {
