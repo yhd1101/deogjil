@@ -64,4 +64,23 @@ export class ContentsService {
       },
     };
   }
+
+  async contentGetById(id: string) {
+    const content = await this.contentRepository
+      .createQueryBuilder('content')
+      .leftJoinAndSelect('content.writer', 'writer')
+      .where('content.id= :id', { id })
+      .getOne();
+    return content;
+  }
+  async contentUpdateById(id: string, createContentDto: CreateContentDto) {
+    await this.contentRepository.update(id, createContentDto);
+
+    return 'updated content';
+  }
+
+  async contentDeleteById(id: string) {
+    await this.contentRepository.delete({ id });
+    return 'deleted';
+  }
 }

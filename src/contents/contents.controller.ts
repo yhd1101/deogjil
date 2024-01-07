@@ -9,6 +9,8 @@ import {
   UseGuards,
   Req,
   Query,
+  NotFoundException,
+  Put,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
@@ -56,4 +58,36 @@ export class ContentsController {
   async getAllContent(@Query('page') page: number) {
     return await this.contentsService.contentGetAll(page);
   }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: '글 상세페이지',
+    description: '글 상세페이지 불러옴',
+  })
+  async getContentById(@Param('id') id: string) {
+    try {
+      const content = await this.contentsService.contentGetById(id);
+      return content;
+    } catch (err) {
+      throw new NotFoundException('No Content');
+    }
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
+  async updateContentById(
+    @Body() createContentDto: CreateContentDto,
+    @Param('id') id: string,
+  ) {
+    try {
+      return await this.contentsService.contentUpdateById(id, createContentDto);
+    } catch (err) {
+      throw new NotFoundException('No Content');
+    }
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: '글 삭제', description: '글을 삭제함' })
+  async deleteContentById(@Param('id') id: string) {}
 }
