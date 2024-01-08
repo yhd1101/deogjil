@@ -4,6 +4,7 @@ import { Provider } from './provider.enum';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as gravatar from 'gravatar';
 import { Content } from '../../contents/entities/content.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User extends CommonEntity {
@@ -25,6 +26,12 @@ export class User extends CommonEntity {
 
   @OneToMany(() => Content, (content: Content) => content.writer)
   public content: Content[];
+
+  @Column({
+    nullable: true,
+  })
+  @Exclude()
+  public currentHashedRefreshToken?: string;
 
   // @BeforeInsert()
   // async beforeSaveFunction(): Promise<void> {

@@ -15,6 +15,9 @@ import * as Joi from '@hapi/joi';
         ACCESSTOKEN_SECRET_KEY: Joi.string().required(),
         ACCESSTOKEN_EXPIRATION_TIME: Joi.number().required(),
 
+        REFRESHTOKEN_SECRET_KEY: Joi.string().required(),
+        REFRESHTOKEN_EXPIRATION_TIME: Joi.string().required(),
+
         KAKAO_AUTH_CLIENTID: Joi.string().required(),
         KAKAO_AUTH_CALLBACK_URL: Joi.string().required(),
       }),

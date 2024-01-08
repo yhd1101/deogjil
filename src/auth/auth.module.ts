@@ -6,11 +6,17 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { KakaoAuthStrategy } from './strategies/kakao-auth.strategy';
-import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
+import { JwtAccessAuthStrategy } from './strategies/jwtAccess-auth.strategy';
+import { JwtRefreshAuthStrategy } from './strategies/jwtRefresh-auth.strategy';
 
 @Module({
   imports: [ConfigModule, UserModule, JwtModule.register({}), PassportModule],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthStrategy, KakaoAuthStrategy],
+  providers: [
+    AuthService,
+    JwtAccessAuthStrategy,
+    JwtRefreshAuthStrategy,
+    KakaoAuthStrategy,
+  ],
 })
 export class AuthModule {}

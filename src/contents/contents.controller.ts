@@ -22,7 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 
@@ -41,7 +41,7 @@ export class ContentsController {
     description: 'create content',
   })
   @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessAuthGuard)
   async createContent(
     @Req() req: RequestWithUserInterface,
     @Body() createContentDto: CreateContentDto,
@@ -74,7 +74,7 @@ export class ContentsController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateContentById(
     @Body() createContentDto: CreateContentDto,
