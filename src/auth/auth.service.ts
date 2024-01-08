@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayloadInterface } from './tokenPayload.interface';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { LoginUserDto } from '../user/dto/login-user.dto';
+import { Provider } from '../user/entities/provider.enum';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,32 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+
+  async createUser(createUserDto: CreateUserDto) {
+    const user = await this.userService.CreateUser({
+      ...createUserDto,
+      provider: Provider.LOCAL,
+    });
+    user.password = undefined;
+
+    return user;
+  }
+
+  async Login(loginUserDto: LoginUserDto) {
+    const user = await this.userService.getUserByEmail(loginUserDto.email);
+    const isPasswordMatched = await user.validatePassword(
+      loginUserDto.password,
+    );
+
+    if (!isPasswordMatched) {
+      throw new HttpException(
+        'Password do not matched',
+        HttpStatus.BAD_REQUEST,
+      );
+    } //email에서 입력한 패스워드랑 우리가 찾는 패스워드가 같지 않으면
+    // user.password = undefined;
+    return user;
+  }
 
   //토큰 생성함수
   public generateAccessToken(userId: string) {

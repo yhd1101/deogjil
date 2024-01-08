@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { KakaoAuthStrategy } from './strategies/kakao-auth.strategy';
 import { JwtAccessAuthStrategy } from './strategies/jwtAccess-auth.strategy';
 import { JwtRefreshAuthStrategy } from './strategies/jwtRefresh-auth.strategy';
+import { LocalAuthStrategy } from './strategies/local-auth.strategy';
 
 @Module({
   imports: [ConfigModule, UserModule, JwtModule.register({}), PassportModule],
@@ -17,6 +18,7 @@ import { JwtRefreshAuthStrategy } from './strategies/jwtRefresh-auth.strategy';
     JwtAccessAuthStrategy,
     JwtRefreshAuthStrategy,
     KakaoAuthStrategy,
+    LocalAuthStrategy,
   ],
 })
 export class AuthModule {}

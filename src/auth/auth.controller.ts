@@ -19,6 +19,11 @@ import { UserService } from '../user/user.service';
 import { JwtRefreshAuthGuard } from './guards/jwtRefresh-auth.guard';
 import { RequestWithUserInterface } from './requestWithUser.interface';
 import { JwtAccessAuthGuard } from './guards/jwtAccess-auth.guard';
+import { ApiBody, ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import { User } from '../user/entities/user.entity';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { LoginUserDto } from '../user/dto/login-user.dto';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -26,6 +31,33 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
+
+  @Post('signup')
+  @ApiCreatedResponse({
+    description: 'the record has been success with user',
+    type: User,
+  }) //성공시 응답을 해주겠다.
+  async userSignup(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.createUser(createUserDto);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: '로그인API', description: '로그인해주는 api' })
+  @ApiCreatedResponse({ description: '로그인함', type: User })
+  @ApiBody({ type: LoginUserDto })
+  @HttpCode(200)
+  @UseGuards(LocalAuthGuard) //Guard에서 검증됨
+  async userLogin(@Req() req: RequestWithUserInterface) {
+    const user = req.user;
+    const accessToken = await this.authService.generateAccessToken(user.id);
+    const { cookie: refreshTokenCookie, refreshToken } =
+      await this.authService.generateRefreshToken(user.id);
+    await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+    req.res.setHeader('Set-Cookie', [accessToken, refreshTokenCookie]);
+
+    return user;
+    // return await this.authService.Login(loginUserDto);
+  }
 
   @HttpCode(200)
   @Get('kakao')
