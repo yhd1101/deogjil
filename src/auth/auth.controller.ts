@@ -76,8 +76,9 @@ export class AuthController {
     const { cookie: refreshTokenCookie, refreshToken } =
       await this.authService.generateRefreshToken(user.id);
     await this.userService.setCurrentRefreshToken(refreshToken, user.id);
-    req.res.setHeader('Set-Cookie', [accessToken, refreshTokenCookie]);
-    return user;
+    user.currentHashedRefreshToken = undefined;
+    req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
+    return { accessToken, user };
     //return { accessToken, refreshToken, user };
   }
 

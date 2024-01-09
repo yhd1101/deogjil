@@ -6,9 +6,10 @@ import { AppConfigModule } from "./common/config/config.module";
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ContentsModule } from './contents/contents.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
-  imports: [AppConfigModule,DatabaseModule, UserModule, AuthModule, ContentsModule],
+  imports: [AppConfigModule,DatabaseModule, UserModule, AuthModule, ContentsModule, LikesModule],
   controllers: [AppController],
   providers: [AppService],
 })

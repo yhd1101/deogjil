@@ -10,6 +10,7 @@ import * as gravatar from 'gravatar';
 import * as bcrypt from 'bcryptjs';
 import { Content } from '../../contents/entities/content.entity';
 import { Exclude } from 'class-transformer';
+import { Like } from '../../likes/entities/like.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -40,6 +41,9 @@ export class User extends CommonEntity {
   })
   @Exclude()
   public currentHashedRefreshToken?: string;
+
+  @OneToMany(() => Like, (like: Like) => like.user)
+  public like: Like[];
 
   @BeforeInsert()
   async beforeSaveFunction(): Promise<void> {

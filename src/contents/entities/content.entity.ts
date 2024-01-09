@@ -1,6 +1,7 @@
 import { CommonEntity } from '../../common/entities/common.entity';
-import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { Like } from '../../likes/entities/like.entity';
 @Entity()
 export class Content extends CommonEntity {
   @Column()
@@ -25,4 +26,7 @@ export class Content extends CommonEntity {
   @ManyToOne(() => User, (user: User) => user.content)
   @JoinColumn()
   public writer: User;
+
+  @OneToMany(() => Like, (like: Like) => like.content)
+  public like: Like[];
 }

@@ -48,11 +48,11 @@ export class AuthService {
       secret: this.configService.get('ACCESSTOKEN_SECRET_KEY'),
       expiresIn: `${this.configService.get('ACCESSTOKEN_EXPIRATION_TIME')}m`,
     });
-    return `Authentication=${accessToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
-      'ACCESSTOKEN_EXPIRATION_TIME',
-    )}`;
+    // return `Authentication=${accessToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
+    //   'ACCESSTOKEN_EXPIRATION_TIME',
+    // )}`;
 
-    // return accessToken;
+    return accessToken;
   }
 
   public generateRefreshToken(userId: string) {
