@@ -11,6 +11,7 @@ import * as bcrypt from 'bcryptjs';
 import { Content } from '../../contents/entities/content.entity';
 import { Exclude } from 'class-transformer';
 import { Like } from '../../likes/entities/like.entity';
+import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -35,6 +36,12 @@ export class User extends CommonEntity {
 
   @OneToMany(() => Content, (content: Content) => content.writer)
   public content: Content[];
+
+  @OneToMany(
+    () => Talkcontent,
+    (talkcontent: Talkcontent) => talkcontent.writer,
+  )
+  public talkContent: Talkcontent[];
 
   @Column({
     nullable: true,

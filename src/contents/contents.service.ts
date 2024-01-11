@@ -21,7 +21,8 @@ export class ContentsService {
       writer: user,
     });
 
-    await this.contentRepository.save(newContent);
+    const save = await this.contentRepository.save(newContent);
+    console.log(save.tag[0]);
 
     return newContent;
   }
