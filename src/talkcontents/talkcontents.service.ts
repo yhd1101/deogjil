@@ -4,6 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Talkcontent } from './entities/talkcontent.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { PageMetaDto } from '../common/dtos/page-meta.dto';
 
 @Injectable()
 export class TalkcontentsService {
@@ -25,12 +28,21 @@ export class TalkcontentsService {
     return newTalkContent;
   }
 
-  async talkContentGetAll() {
+  async talkContentGetAll(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Talkcontent>> {
     const queryBuilder =
       await this.talkcontentRepository.createQueryBuilder('talkContents'); //db에 쿼리를직접 해줌
-    queryBuilder.leftJoinAndSelect('talkContents.writer', 'writer'); //관계형
+    queryBuilder.leftJoinAndSelect('talkContents.writer', 'writer');
+
+    await queryBuilder
+      .orderBy('talkContents.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take);
+    const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
-    return entities;
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto<Talkcontent>(entities, pageMetaDto);
   }
 
   async talkContentGetById(id: string) {

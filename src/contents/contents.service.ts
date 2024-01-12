@@ -22,7 +22,6 @@ export class ContentsService {
     });
 
     const save = await this.contentRepository.save(newContent);
-    console.log(save.tag[0]);
 
     return newContent;
   }
@@ -44,26 +43,21 @@ export class ContentsService {
   //   return new PageDto(entities, pageMetaDto);
   // }
 
-  async contentGetAll(page: number = 1): Promise<any> {
-    const take = 8;
+  async contentGetAll(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Content>> {
+    const queryBuilder =
+      await this.contentRepository.createQueryBuilder('contents');
+    queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
 
-    const [contents, itemCount] = await this.contentRepository.findAndCount({
-      take,
-      skip: (page - 1) * take,
-      relations: ['writer'], // Assuming 'writer' is the relation in your Content entity
-      order: { createdAt: 'ASC' }, // Adjust the order as per your requirements
-    });
-
-    return {
-      data: contents,
-      meta: {
-        itemCount,
-        page,
-        pageCount: Math.ceil(itemCount / take),
-        hasPreviousPage: page > 1,
-        hasNextPage: page < Math.ceil(itemCount / take),
-      },
-    };
+    await queryBuilder
+      .orderBy('contents.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take);
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto<Content>(entities, pageMetaDto);
   }
 
   async contentGetById(id: string) {

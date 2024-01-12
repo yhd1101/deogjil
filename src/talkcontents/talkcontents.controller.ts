@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { TalkcontentsService } from './talkcontents.service';
 import { CreateTalkcontentDto } from './dto/create-talkcontent.dto';
@@ -20,6 +21,9 @@ import {
 } from '@nestjs/swagger';
 import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
+import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { Talkcontent } from './entities/talkcontent.entity';
 
 @Controller('talkcontents')
 export class TalkcontentsController {
@@ -45,5 +49,16 @@ export class TalkcontentsController {
       req.user,
     );
     return newContent;
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: '덕질토크 전체조회',
+    description: '덕질토크 전체조회해줌',
+  })
+  async getAllTalkContents(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Talkcontent>> {
+    return await this.talkcontentsService.talkContentGetAll(pageOptionsDto);
   }
 }

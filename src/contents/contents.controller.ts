@@ -25,6 +25,8 @@ import {
 import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
+import { PageDto } from '../common/dtos/page.dto';
+import { Content } from './entities/content.entity';
 
 @ApiTags('Content')
 @Controller('content')
@@ -55,8 +57,10 @@ export class ContentsController {
 
   @Get()
   @ApiOperation({ summary: '글전체목록', description: '전체 글 조회' })
-  async getAllContent(@Query('page') page: string = '1') {
-    return await this.contentsService.contentGetAll(Number(page));
+  async getAllContent(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Content>> {
+    return await this.contentsService.contentGetAll(pageOptionsDto);
   }
 
   @Get(':id')
