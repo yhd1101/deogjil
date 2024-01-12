@@ -9,6 +9,8 @@ import {
   UseGuards,
   Req,
   Query,
+  Put,
+  NotFoundException,
 } from '@nestjs/common';
 import { TalkcontentsService } from './talkcontents.service';
 import { CreateTalkcontentDto } from './dto/create-talkcontent.dto';
@@ -18,13 +20,16 @@ import {
   ApiBody,
   ApiOperation,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Talkcontent } from './entities/talkcontent.entity';
+import { CreateContentDto } from '../contents/dto/create-content.dto';
 
+@ApiTags('talkContents')
 @Controller('talkcontents')
 export class TalkcontentsController {
   constructor(private readonly talkcontentsService: TalkcontentsService) {}
@@ -60,5 +65,44 @@ export class TalkcontentsController {
     @Query() pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<Talkcontent>> {
     return await this.talkcontentsService.talkContentGetAll(pageOptionsDto);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: '글 상세페이지',
+    description: '글 상세페이지 불러옴',
+  })
+  async getTalkContentById(@Param('id') id: string) {
+    try {
+      const content = await this.talkcontentsService.talkContentGetById(id);
+      return content;
+    } catch (err) {
+      throw new NotFoundException('No Content');
+    }
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
+  async updateTalkContentById(
+    @Body() createTalkcontentDto: CreateTalkcontentDto,
+    @Param('id') id: string,
+    @Req() req: RequestWithUserInterface,
+  ) {
+    return await this.talkcontentsService.talkContentUpdateById(
+      id,
+      createTalkcontentDto,
+      req.user,
+    );
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: '글 삭제', description: '글을 삭제함' })
+  async deleteTalkContentById(
+    @Param('id') id: string,
+    @Req() req: RequestWithUserInterface,
+  ) {
+    return await this.talkcontentsService.tallContentDeleteById(id, req.user);
   }
 }

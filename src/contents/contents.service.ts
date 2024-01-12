@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -68,14 +72,52 @@ export class ContentsService {
       .getOne();
     return content;
   }
-  async contentUpdateById(id: string, createContentDto: CreateContentDto) {
+
+  async contentUpdateById(
+    id: string,
+    createContentDto: CreateContentDto,
+    user: User,
+  ) {
+    const content = await this.contentRepository.findOne({
+      where: { id },
+      relations: ['writer'],
+    });
+
+    if (!content) {
+      // 글이 없는 경우 NotFoundException을 던짐
+      throw new NotFoundException('Content not found');
+    }
+
+    // 사용자가 글의 작성자인지 확인
+    if (content.writer.id !== user.id) {
+      // 권한이 없는 경우 ForbiddenException을 던짐
+      throw new ForbiddenException(
+        'You do not have permission to update this content',
+      );
+    }
+
+    // 글을 수정
     await this.contentRepository.update(id, createContentDto);
 
-    return 'updated content';
+    return 'Updated content';
   }
 
-  async contentDeleteById(id: string) {
-    await this.contentRepository.delete({ id });
+  async contentDeleteById(id: string, user: User) {
+    const content = await this.contentRepository.findOne({
+      where: { id },
+      relations: ['writer'],
+    });
+    if (!content) {
+      throw new NotFoundException('Content Not Found');
+    }
+
+    if (content.writer.id !== user.id) {
+      throw new ForbiddenException(
+        'You do not have permission to update this content',
+      );
+    }
+
+    await this.contentRepository.delete(id);
     return 'deleted';
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTalkcontentDto } from './dto/create-talkcontent.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Talkcontent } from './entities/talkcontent.entity';
@@ -57,14 +61,45 @@ export class TalkcontentsService {
   async talkContentUpdateById(
     id: string,
     createTalkContentDto: CreateTalkcontentDto,
+    user: User,
   ) {
-    await this.talkcontentRepository.update(id, createTalkContentDto);
+    const content = await this.talkcontentRepository.findOne({
+      where: { id },
+      relations: ['writer'],
+    });
 
-    return 'updated content';
+    if (!content) {
+      // 글이 없는 경우 NotFoundException을 던짐
+      throw new NotFoundException('Content not found');
+    }
+
+    // 사용자가 글의 작성자인지 확인
+    if (content.writer.id !== user.id) {
+      // 권한이 없는 경우 ForbiddenException을 던짐
+      throw new ForbiddenException(
+        'You do not have permission to update this content',
+      );
+    }
+
+    await this.talkcontentRepository.update(id, createTalkContentDto);
+    return 'Updated talkContent';
   }
 
-  async tallContentDeleteById(id: string) {
-    await this.talkcontentRepository.delete({ id });
+  async tallContentDeleteById(id: string, user: User) {
+    const content = await this.talkcontentRepository.findOne({
+      where: { id },
+      relations: ['writer'],
+    });
+    if (!content) {
+      throw new NotFoundException('Content Not Found');
+    }
+
+    if (content.writer.id !== user.id) {
+      throw new ForbiddenException(
+        'You do not have permission to update this content',
+      );
+    }
+    await this.talkcontentRepository.delete(id);
     return 'deleted';
   }
 }

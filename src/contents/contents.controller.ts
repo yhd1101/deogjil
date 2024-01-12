@@ -83,15 +83,24 @@ export class ContentsController {
   async updateContentById(
     @Body() createContentDto: CreateContentDto,
     @Param('id') id: string,
+    @Req() req: RequestWithUserInterface,
   ) {
-    try {
-      return await this.contentsService.contentUpdateById(id, createContentDto);
-    } catch (err) {
-      throw new NotFoundException('No Content');
-    }
+    console.log('dddd', id);
+    // 현재 사용자 정보를 서비스 레이어로 전달
+    return await this.contentsService.contentUpdateById(
+      id,
+      createContentDto,
+      req.user,
+    );
   }
 
   @Delete(':id')
+  @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 삭제', description: '글을 삭제함' })
-  async deleteContentById(@Param('id') id: string) {}
+  async deleteContentById(
+    @Param('id') id: string,
+    @Req() req: RequestWithUserInterface,
+  ) {
+    return await this.contentsService.contentDeleteById(id, req.user);
+  }
 }
