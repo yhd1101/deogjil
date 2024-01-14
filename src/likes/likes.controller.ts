@@ -1,34 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { CreateLikeDto } from './dto/create-like.dto';
 import { UpdateLikeDto } from './dto/update-like.dto';
+import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
+import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Controller('likes')
+@ApiTags('Like')
+@Controller('like')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
-  @Post()
-  create(@Body() createLikeDto: CreateLikeDto) {
-    return this.likesService.create(createLikeDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.likesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.likesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLikeDto: UpdateLikeDto) {
-    return this.likesService.update(+id, updateLikeDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.likesService.remove(+id);
+  @Post('create')
+  @ApiBody({ type: CreateLikeDto })
+  @ApiOperation({
+    summary: '좋아요기능',
+    description: '좋아요기능',
+  })
+  @ApiOperation({
+    description: 'like',
+  })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
+  async likeContent(
+    @Req() req: RequestWithUserInterface,
+    @Body() createLikeDto: CreateLikeDto,
+  ) {
+    console.log(createLikeDto);
+    const likeCount = await this.likesService.likeContent(
+      req.user,
+      createLikeDto,
+    );
+    return likeCount;
   }
 }
