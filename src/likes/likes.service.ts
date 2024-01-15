@@ -13,6 +13,7 @@ import { Repository, getConnection } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { Content } from '../contents/entities/content.entity';
 import { Talkcontent } from '../talkcontents/entities/talkcontent.entity';
+import { CreateTalkLikeDto } from './dto/create-talkLike.dto';
 
 @Injectable()
 export class LikesService {
@@ -21,39 +22,58 @@ export class LikesService {
   ) {}
 
   async likeContent(user: User, createLikeDto: CreateLikeDto) {
-    const { content, talkContent } = createLikeDto;
-
-    // 중복 좋아요 여부 확인
-    const existingLikes = await this.likeRepository.find({
-      relations: ['user'],
-    });
-
-    // 콘텐츠 ID가 중복되는 좋아요 확인
-    const existingContentLike = existingLikes.find((like) => {
-      return like.user.id === user.id && like.content === content;
-    });
-
-    // 토크 콘텐츠 ID가 중복되는 좋아요 확인
-    const existingTalkContentLike = existingLikes.find((like) => {
-      return like.user.id === user.id && like.talkContent === talkContent;
-    });
-
-    // 중복된 좋아요가 있는 경우 예외 발생
-    if (existingContentLike) {
-      throw new ConflictException('User already liked this content');
-    }
-    if (existingTalkContentLike) {
-      throw new ConflictException('User already liked this content');
-    }
-
-    // 좋아요 생성 및 저장
     const newLike = this.likeRepository.create({
       user,
       ...createLikeDto,
     });
-    await this.likeRepository.save(newLike);
 
-    return newLike;
+    console.log(createLikeDto.content);
+    // 사용자와 함께 연관된 좋아요를 로드하여 확인
+    const existingLike = await this.likeRepository.find({
+      relations: ['user', 'content', 'talkContent'],
+    });
+
+    const userIds = existingLike.map((like) => like.user.id);
+    const contentsId = existingLike.map((like) => like.content.id);
+    console.log(userIds);
+    console.log('ddsad', contentsId);
+    console.log('dq23123', newLike.user.id);
+    console.log('12321312312', newLike.content.id);
+
+    if (
+      userIds.includes(newLike.user.id) &&
+      contentsId.includes(newLike.content.id)
+    ) {
+      throw new ConflictException('User already liked this content');
+    } else {
+      await this.likeRepository.save(newLike);
+      return newLike;
+    }
+  }
+
+  async talkContentLike(user: User, createTalkLikeDto: CreateTalkLikeDto) {
+    const newLike = this.likeRepository.create({
+      user,
+      ...createTalkLikeDto,
+    });
+    const existingLike = await this.likeRepository.find({
+      relations: ['user', 'talkContent'],
+    });
+    console.log(existingLike);
+
+    const userIds = existingLike.map((like) => like.user.id);
+    console.log('dsads', userIds);
+    const contentsId = existingLike.map((like) => like.talkContent.id);
+    console.log('dsqq3123', contentsId);
+    if (
+      userIds.includes(newLike.user.id) &&
+      contentsId.includes(newLike.talkContent.id)
+    ) {
+      throw new ConflictException('User already liked this talkContent');
+    } else {
+      await this.likeRepository.save(newLike);
+      return newLike;
+    }
   }
 
   // async likeContent(user: User, createLikeDto: CreateLikeDto) {

@@ -9,10 +9,4 @@ export class CreateLikeDto {
     default: 'contentId',
   })
   content: Content;
-
-  @ApiProperty({
-    description: 'insert talkcontentId',
-    default: 'talkContentId',
-  })
-  talkContent: Talkcontent;
 }

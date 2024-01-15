@@ -12,21 +12,23 @@ services:
     networks:
       - backend-networks
 
-#
-#  nestjs_api:
-#    build:
-#      dockerfile: Dockerfile
-#      context: .
-#      target: development
-#    env_file:
-#      - .env
-#    command: npm run start:dev
-#    ports:
-#      - 8000:8000
-#    networks:
-#      - backend-networks
-#
-#
+  nestjs_api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: development
+
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - .env
+    command: npm run start:dev
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres #상단 이름 인식
+    networks:
+      - backend-networks
 
 networks:
   backend-networks:

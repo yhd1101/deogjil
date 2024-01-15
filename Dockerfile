@@ -12,8 +12,12 @@ WORKDIR /usr/src/app
 # Copying this first prevents re-running npm install on every code change.
 COPY --chown=node:node package*.json ./
 
+RUN npm install -g npm@10.3.0
+
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN npm install --force
+RUN npm ci --force
+#force 추가해야 도커환경내에서 빌드됌 <- npm i hybrid force 어쩌고했던 것 때문임,,,
+#이부분은 nestjs 도커 설정한 부분을 살리면 실행되는걸 확인해야함 ^^
 
 # Bundle app source
 COPY --chown=node:node . .
@@ -31,7 +35,10 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node package*.json ./
 
-# In order to run `npm run build` we need access to the Nest CLI which is a dev dependency. In the previous development stage we ran `npm ci` which installed all dependencies, so we can copy over the node_modules directory from the development image
+# In order to run `npm run build` we need access to the Nest CLI.
+# The Nest CLI is a dev dependency,
+# In the previous development stage we ran `npm ci` which installed all dependencies.
+# So we can copy over the node_modules directory from the development image into this build image.
 COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
 
 COPY --chown=node:node . .
@@ -42,8 +49,10 @@ RUN npm run build
 # Set NODE_ENV environment variable
 ENV NODE_ENV production
 
-# Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
-RUN npm ci --only=production && npm cache clean --force
+# Running `npm ci` removes the existing node_modules directory.
+# Passing in —only=production ensures that only the production dependencies are installed.
+# This ensures that the node_modules directory is as optimized as possible.
+RUN npm ci —only=production && npm cache clean —force
 
 USER node
 
@@ -51,11 +60,11 @@ USER node
 # PRODUCTION
 ###################
 
-FROM node:18-alpine As production
+# FROM node:18-alpine As production
 
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node —from=build /usr/src/app/dist ./dist
+# # Copy the bundled code from the build stage to the production image
+# COPY —chown=node:node —from=build /usr/src/app/node_modules ./node_modules
+# COPY —chown=node:node —from=build /usr/src/app/dist ./dist
 
-# Start the server using the production build
-CMD [ "node", "dist/main.js" ]
+# # Start the server using the production build
+# CMD [ "node", "dist/main.js" ]
