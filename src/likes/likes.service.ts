@@ -21,60 +21,190 @@ export class LikesService {
     @InjectRepository(Like) private likeRepository: Repository<Like>,
   ) {}
 
-  async likeContent(user: User, createLikeDto: CreateLikeDto) {
+  async createLike(user: User, createLikeDto: CreateLikeDto) {
     const newLike = this.likeRepository.create({
       user,
       ...createLikeDto,
     });
-
-    console.log(createLikeDto.content);
     // 사용자와 함께 연관된 좋아요를 로드하여 확인
     const existingLike = await this.likeRepository.find({
       relations: ['user', 'content', 'talkContent'],
     });
+    const userIds = existingLike
+      .map((like) => (like.user ? like.user.id : null))
+      .filter((id) => id !== null);
+    const contenteIDs = existingLike
+      .map((like) => (like.content ? like.content.id : null)) // Content 객체 그대로 저장
+      .filter((id) => id !== null);
+    const talkContents = existingLike
+      .map((like) => (like.talkContent ? like.talkContent.id : null)) // Content 객체 그대로 저장
+      .filter((id) => id !== null);
+    console.log(talkContents);
 
-    const userIds = existingLike.map((like) => like.user.id);
-    const contentsId = existingLike.map((like) => like.content.id);
-    console.log(userIds);
-    console.log('ddsad', contentsId);
-    console.log('dq23123', newLike.user.id);
-    console.log('12321312312', newLike.content.id);
+    console.log(newLike.talkContent.id);
 
     if (
       userIds.includes(newLike.user.id) &&
-      contentsId.includes(newLike.content.id)
+      talkContents.includes(newLike.talkContent.id)
     ) {
-      throw new ConflictException('User already liked this content');
-    } else {
-      await this.likeRepository.save(newLike);
-      return newLike;
+      throw new ConflictException('already liked');
     }
-  }
 
-  async talkContentLike(user: User, createTalkLikeDto: CreateTalkLikeDto) {
-    const newLike = this.likeRepository.create({
-      user,
-      ...createTalkLikeDto,
-    });
-    const existingLike = await this.likeRepository.find({
-      relations: ['user', 'talkContent'],
-    });
-    console.log(existingLike);
-
-    const userIds = existingLike.map((like) => like.user.id);
-    console.log('dsads', userIds);
-    const contentsId = existingLike.map((like) => like.talkContent.id);
-    console.log('dsqq3123', contentsId);
     if (
       userIds.includes(newLike.user.id) &&
-      contentsId.includes(newLike.talkContent.id)
+      contenteIDs.includes(newLike.content.id)
     ) {
-      throw new ConflictException('User already liked this talkContent');
-    } else {
-      await this.likeRepository.save(newLike);
-      return newLike;
+      throw new ConflictException('already liked');
     }
+    await this.likeRepository.save(newLike);
+    return newLike;
   }
+
+  // async createLike(
+  //   user: User,
+  //   content: Content,
+  //   talkContent: Talkcontent,
+  // ): Promise<Like> {
+  //   // Check if the user has already liked the content or talkContent
+  //   const existingLike = await this.likeRepository.findOne({
+  //     where: [
+  //       { user, content },
+  //       { user, talkContent },
+  //     ],
+  //   });
+  //
+  //   if (existingLike) {
+  //     // Handle case where user has already liked the content or talkContent
+  //     // For example, you can throw an exception or return an error response
+  //     throw new Error('User has already liked the content or talkContent');
+  //   }
+  //
+  //   // Create a new like
+  //   const newLike = this.likeRepository.create({ user, content, talkContent });
+  //   return this.likeRepository.save(newLike);
+  // }
+  // async talkContentLike(
+  //   user: User,
+  //   category: string,
+  //   createLikeDto: CreateLikeDto,
+  // ) {
+  //   const { content, talkContent } = createLikeDto;
+  //
+  //   // content와 talkContent 모두 없는 경우 에러 처리 또는 다른 처리 로직 수행
+  //   if (!content && !talkContent) {
+  //     throw new BadRequestException(
+  //       'Either content or talkContent must be provided',
+  //     );
+  //   }
+  //
+  //   // 중복 좋아요 체크 로직 추가
+  //   const existingLike = await this.likeRepository.findOne({
+  //     where: {
+  //       user,
+  //       [content ? 'content' : 'talkContent']: content || talkContent,
+  //     },
+  //     relations: ['user', 'content', 'talkContent'],
+  //   });
+  //
+  //   if (existingLike) {
+  //     throw new ConflictException('Already liked');
+  //   }
+  //
+  //   // 중복이 아닌 경우 좋아요 저장 로직 수행
+  //   const newLike = this.likeRepository.create({
+  //     user,
+  //     content: content || null,
+  //     talkContent: talkContent || null,
+  //   });
+  //
+  //   if (category === 'content') {
+  //     newLike.content = content;
+  //   } else if (category === 'talkContent') {
+  //     newLike.talkContent = talkContent;
+  //   }
+  //
+  //   await this.likeRepository.save(newLike);
+  //
+  //   return newLike;
+  // }
+
+  // async likeContent(
+  //   user: User,
+  //   category: string,
+  //   createLikeDto: CreateLikeDto,
+  // ) {
+  //   const { content, talkContent } = createLikeDto;
+  //
+  //   if (!content && !talkContent) {
+  //     throw new BadRequestException('No ContendId, talkContentId');
+  //   }
+  //   const existingLike = await this.likeRepository.findOne({
+  //     where: {
+  //       user,
+  //       [content ? 'content' : 'talkContent']: content || talkContent,
+  //     },
+  //     relations: ['user', 'content', 'talkContent'],
+  //   });
+  //
+  //   if (existingLike) {
+  //     throw new ConflictException('liked already');
+  //   }
+  //
+  //   const newLike = this.likeRepository.create({
+  //     user,
+  //     content: content ? { id: content } : null,
+  //     talkContent: talkContent ? { id: talkContent } : null,
+  //   });
+  //
+  //   if (category === 'content') {
+  //     newLike.content = { category: content };
+  //     // content에 대한 처리 로직 추가
+  //     // 예: newLike.content = { id: content };
+  //   } else if (category === 'talkContent') {
+  //     // talkContent에 대한 처리 로직 추가
+  //     // 예: newLike.talkContent = { id: talkContent };
+  //   }
+  // }
+
+  async likeContent(user: User, createLikeDto: CreateLikeDto) {
+    //
+    // await this.likeRepository.save(newLike);
+    // return newLike;
+    // console.log('dq23123', newLike.user.id);
+    // console.log('12321312312', newLike.content.id);
+    // if (userIds.includes(newLike.user.id)) {
+    //   console.log('******');
+    //   // throw new ConflictException('User already liked this content');
+    // } else {
+    //   await this.likeRepository.save(newLike);
+    //   return newLike;
+    // }
+  }
+  //
+  // async talkContentLike(user: User, createTalkLikeDto: CreateTalkLikeDto) {
+  //   const newLike = this.likeRepository.create({
+  //     user,
+  //     ...createTalkLikeDto,
+  //   });
+  //   const existingLike = await this.likeRepository.find({
+  //     relations: ['user', 'talkContent'],
+  //   });
+  //   console.log(existingLike);
+  //
+  //   const userIds = existingLike.map((like) => like.user.id);
+  //   console.log('dsads', userIds);
+  //   const contentsId = existingLike.map((like) => like.talkContent.id);
+  //   console.log('dsqq3123', contentsId);
+  //   if (
+  //     userIds.includes(newLike.user.id) &&
+  //     contentsId.includes(newLike.talkContent.id)
+  //   ) {
+  //     throw new ConflictException('User already liked this talkContent');
+  //   } else {
+  //     await this.likeRepository.save(newLike);
+  //     return newLike;
+  //   }
+  // }
 
   // async likeContent(user: User, createLikeDto: CreateLikeDto) {
   //   try {

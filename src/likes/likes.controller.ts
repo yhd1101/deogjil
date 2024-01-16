@@ -22,14 +22,14 @@ import { CreateTalkLikeDto } from './dto/create-talkLike.dto';
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
-  @Post('content')
+  @Post('create')
   @ApiBody({ type: CreateLikeDto })
   @ApiOperation({
     summary: '좋아요기능',
     description: '좋아요기능',
   })
   @ApiOperation({
-    description: 'like',
+    description: 'Like',
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
@@ -37,33 +37,49 @@ export class LikesController {
     @Req() req: RequestWithUserInterface,
     @Body() createLikeDto: CreateLikeDto,
   ) {
-    const likeCount = await this.likesService.likeContent(
+    const likeCount = await this.likesService.createLike(
       req.user,
       createLikeDto,
     );
     return likeCount;
   }
 
-  @Post('like/:category')
-  @ApiBody({ type: CreateTalkLikeDto })
-  @ApiOperation({
-    summary: '토크 좋아요기능',
-    description: '토크좋아요기능',
-  })
-  @ApiOperation({
-    description: 'like',
-  })
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAccessAuthGuard)
-  async talkContentLike(
-    @Req() req: RequestWithUserInterface,
-    @Body() createTalkLikeDto: CreateTalkLikeDto,
-  ) {
-    const likeCount = await this.likesService.talkContentLike(
-      req.user,
-      createTalkLikeDto,
-    );
+  // @Post('create')
+  // @ApiBody({ type: CreateLikeDto })
+  // @ApiOperation({
+  //   summary: '좋아요기능',
+  //   description: '좋아요기능',
+  // })
+  // @ApiOperation({
+  //   description: 'like',
+  // })
+  // @ApiBearerAuth('access-token')
+  // @UseGuards(JwtAccessAuthGuard)
+  // async likeContent(
+  //   @Req() req: RequestWithUserInterface,
+  //   @Body() createLikeDto: CreateLikeDto,
+  // ) {
+  //   const likeCount = await this.likesService.likeContent(
+  //     req.user,
+  //     createLikeDto,
+  //   );
+  //   return likeCount;
+  // }
 
-    return likeCount;
-  }
+  // @Post('like/:category')
+  // @ApiBody({ type: CreateTalkLikeDto })
+  // @ApiOperation({
+  //   summary: '토크 좋아요기능',
+  //   description: '토크좋아요기능',
+  // })
+  // @ApiOperation({
+  //   description: 'like',
+  // })
+  // @ApiBearerAuth('access-token')
+  // @UseGuards(JwtAccessAuthGuard)
+  // async talkContentLike(
+  //   @Param('category') category: string,
+  //   @Req() req: RequestWithUserInterface,
+  //   @Body() createTalkLikeDto: CreateTalkLikeDto,
+  // ) {}
 }
