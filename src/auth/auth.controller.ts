@@ -19,12 +19,17 @@ import { UserService } from '../user/user.service';
 import { JwtRefreshAuthGuard } from './guards/jwtRefresh-auth.guard';
 import { RequestWithUserInterface } from './requestWithUser.interface';
 import { JwtAccessAuthGuard } from './guards/jwtAccess-auth.guard';
-import { ApiBody, ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from '../user/entities/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(

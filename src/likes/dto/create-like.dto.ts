@@ -10,7 +10,7 @@ export class CreateLikeDto {
     required: false,
   })
   @IsOptional()
-  content: Content;
+  content?: Content;
 
   @ApiProperty({
     description: 'insert talkContent',
@@ -18,5 +18,5 @@ export class CreateLikeDto {
     required: false,
   })
   @IsOptional()
-  talkContent: Talkcontent;
+  talkContent?: Talkcontent;
 }

@@ -34,28 +34,36 @@ export class LikesService {
       .map((like) => (like.user ? like.user.id : null))
       .filter((id) => id !== null);
     const contenteIDs = existingLike
-      .map((like) => (like.content ? like.content.id : null)) // Content 객체 그대로 저장
+      .map((like) => (like.content ? like.content.id : null))
       .filter((id) => id !== null);
     const talkContents = existingLike
-      .map((like) => (like.talkContent ? like.talkContent.id : null)) // Content 객체 그대로 저장
+      .map((like) => (like.talkContent ? like.talkContent.id : null))
       .filter((id) => id !== null);
     console.log(talkContents);
+    console.log(contenteIDs);
 
     console.log(newLike.talkContent.id);
-
     if (
       userIds.includes(newLike.user.id) &&
       talkContents.includes(newLike.talkContent.id)
     ) {
       throw new ConflictException('already liked');
     }
-
     if (
       userIds.includes(newLike.user.id) &&
       contenteIDs.includes(newLike.content.id)
     ) {
       throw new ConflictException('already liked');
     }
+
+    //
+    // if (
+    //   userIds.includes(newLike.user.id) &&
+    //   contenteIDs.includes(newLike.content.id) &&
+    //   newLike.talkContent.id === null
+    // ) {
+    //   throw new ConflictException('already liked');
+    // }
     await this.likeRepository.save(newLike);
     return newLike;
   }

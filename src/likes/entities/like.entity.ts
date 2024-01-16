@@ -14,7 +14,7 @@ export class Like extends CommonEntity {
     nullable: true,
   })
   @JoinColumn()
-  public content: Content;
+  public content?: Content;
 
   @ManyToOne(
     () => Talkcontent,
@@ -22,5 +22,5 @@ export class Like extends CommonEntity {
     { nullable: true },
   )
   @JoinColumn()
-  public talkContent: Talkcontent;
+  public talkContent?: Talkcontent;
 }
