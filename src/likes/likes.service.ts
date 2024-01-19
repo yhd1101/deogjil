@@ -27,17 +27,18 @@ export class LikesService {
       ...createLikeDto,
     });
 
-    const existingLike = await this.likeRepository.findOne({
-      where: {
-        user: { id: newLike.user.id },
-        content: { id: newLike.content.id },
-        talkContent: { id: newLike.talkContent.id },
-      },
-      relations: ['user', 'content', 'talkContent'],
-    });
-    console.log(existingLike);
+    const likeCount = await this.likeRepository
+      .createQueryBuilder('like')
+      .where('like.user = :userId', { userId: user.id })
+      .andWhere('like.content = :contentId', { contentId: newLike.content.id })
+      .andWhere('like.talkContent = :talkContentId', {
+        talkContentId: newLike.talkContent.id,
+      })
+      .getCount();
 
-    if (existingLike) {
+    console.log(likeCount);
+
+    if (likeCount > 0) {
       throw new ConflictException('already liked');
     }
 

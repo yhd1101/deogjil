@@ -50,12 +50,19 @@ export class TalkcontentsService {
   }
 
   async talkContentGetById(id: string) {
+    const talkContet = await this.talkcontentRepository.findOne({
+      where: { id },
+      relations: ['like'],
+    });
     const talkContent = await this.talkcontentRepository
       .createQueryBuilder('talkContent')
       .leftJoinAndSelect('talkContent.writer', 'writer')
+      .leftJoinAndSelect('talkContent.comment', 'comment')
       .where('talkContent.id= :id', { id })
       .getOne();
-    return talkContent;
+
+    const count = talkContet.like.length;
+    return { talkContent, likeCount: count };
   }
 
   async talkContentUpdateById(

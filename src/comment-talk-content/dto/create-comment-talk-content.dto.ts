@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Content } from '../../contents/entities/content.entity';
+import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 
-export class CreateCommentContentDto {
+export class CreateCommentTalkContentDto {
   @ApiProperty({
     description: 'insert desc',
     default: 'Good',
@@ -12,10 +12,10 @@ export class CreateCommentContentDto {
   desc: string;
 
   @ApiProperty({
-    description: 'insert contentID',
-    default: 'contentid',
+    description: 'insert talkContentId',
+    default: 'talkContentId',
   })
   @IsString()
   @IsNotEmpty()
-  content: Content;
+  talkContent: Talkcontent;
 }

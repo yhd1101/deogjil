@@ -12,6 +12,7 @@ import { User } from '../user/entities/user.entity';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
 import { PageDto } from '../common/dtos/page.dto';
+import { count } from 'rxjs';
 
 @Injectable()
 export class ContentsService {
@@ -65,12 +66,19 @@ export class ContentsService {
   }
 
   async contentGetById(id: string) {
+    const content1 = await this.contentRepository.findOne({
+      where: { id },
+      relations: ['like'],
+    });
     const content = await this.contentRepository
       .createQueryBuilder('content')
       .leftJoinAndSelect('content.writer', 'writer')
+      .leftJoinAndSelect('content.comment', 'comment')
       .where('content.id= :id', { id })
       .getOne();
-    return content;
+
+    const count = content1.like.length;
+    return { content, likeCount: count };
   }
 
   async contentUpdateById(

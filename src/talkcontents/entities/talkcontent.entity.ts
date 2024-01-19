@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CommonEntity } from '../../common/entities/common.entity';
 import { User } from '../../user/entities/user.entity';
 import { Like } from '../../likes/entities/like.entity';
+import { CommentTalkContent } from '../../comment-talk-content/entities/comment-talk-content.entity';
 
 @Entity()
 export class Talkcontent extends CommonEntity {
@@ -29,4 +30,10 @@ export class Talkcontent extends CommonEntity {
 
   @OneToMany(() => Like, (like: Like) => like.talkContent)
   public like: Like[];
+
+  @OneToMany(
+    () => CommentTalkContent,
+    (commentTalkContent: CommentTalkContent) => commentTalkContent.talkContent,
+  )
+  public comment: CommentTalkContent[];
 }

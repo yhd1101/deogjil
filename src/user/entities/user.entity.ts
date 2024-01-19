@@ -13,6 +13,7 @@ import { Exclude } from 'class-transformer';
 import { Like } from '../../likes/entities/like.entity';
 import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 import { CommentContent } from '../../comment-content/entities/comment-content.entity';
+import { CommentTalkContent } from '../../comment-talk-content/entities/comment-talk-content.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -58,6 +59,12 @@ export class User extends CommonEntity {
     (commentContent: CommentContent) => commentContent.writer,
   )
   public commetComment: CommentContent[];
+
+  @OneToMany(
+    () => CommentTalkContent,
+    (commentTalkContent: CommentTalkContent) => commentTalkContent.writer,
+  )
+  public commentTalkComment: CommentTalkContent[];
 
   @BeforeInsert()
   async beforeSaveFunction(): Promise<void> {
