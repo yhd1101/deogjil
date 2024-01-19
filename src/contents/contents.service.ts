@@ -25,7 +25,7 @@ export class ContentsService {
       writer: user,
     });
 
-    const save = await this.contentRepository.save(newContent);
+    await this.contentRepository.save(newContent);
 
     return newContent;
   }
@@ -113,7 +113,7 @@ export class ContentsService {
 
     if (content.writer.id !== user.id) {
       throw new ForbiddenException(
-        'You do not have permission to update this content',
+        'You do not have permission to delete this content',
       );
     }
 

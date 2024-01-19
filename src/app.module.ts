@@ -8,9 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { ContentsModule } from './contents/contents.module';
 import { LikesModule } from './likes/likes.module';
 import { TalkcontentsModule } from './talkcontents/talkcontents.module';
+import { CommentContentModule } from './comment-content/comment-content.module';
 
 @Module({
-  imports: [AppConfigModule,DatabaseModule, UserModule, AuthModule, ContentsModule, LikesModule, TalkcontentsModule],
+  imports: [AppConfigModule,DatabaseModule, UserModule, AuthModule, ContentsModule, LikesModule, TalkcontentsModule, CommentContentModule],
   controllers: [AppController],
   providers: [AppService],
 })
