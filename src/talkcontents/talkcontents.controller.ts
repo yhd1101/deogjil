@@ -82,6 +82,7 @@ export class TalkcontentsController {
   }
 
   @Put(':id')
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateTalkContentById(
@@ -97,6 +98,7 @@ export class TalkcontentsController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 삭제', description: '글을 삭제함' })
   async deleteTalkContentById(

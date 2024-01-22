@@ -50,10 +50,19 @@ export class ContentsService {
 
   async contentGetAll(
     pageOptionsDto: PageOptionsDto,
+    searchQuery?: string,
   ): Promise<PageDto<Content>> {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
+
+    if (searchQuery) {
+      // 만약 검색 쿼리가 제공되었다면, 제목 또는 설명을 기준으로 결과를 필터링하기 위한 WHERE 절을 추가합니다.
+      queryBuilder.where(
+        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery',
+        { searchQuery: `%${searchQuery}%` },
+      );
+    }
 
     await queryBuilder
       .orderBy('contents.createdAt', pageOptionsDto.order)

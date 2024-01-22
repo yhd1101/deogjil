@@ -6,7 +6,7 @@ import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 export class CreateLikeDto {
   @ApiProperty({
     description: 'insert contentId',
-    default: 'contentId',
+    example: { id: null }, // 예제 값 설정
     required: false,
   })
   @IsOptional()
@@ -14,7 +14,7 @@ export class CreateLikeDto {
 
   @ApiProperty({
     description: 'insert talkContent',
-    default: 'talkContent',
+    example: { id: 'talkContentId' }, // 예제 값 설정
     required: false,
   })
   @IsOptional()

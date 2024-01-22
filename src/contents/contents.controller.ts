@@ -59,8 +59,12 @@ export class ContentsController {
   @ApiOperation({ summary: '글전체목록', description: '전체 글 조회' })
   async getAllContent(
     @Query() pageOptionsDto: PageOptionsDto,
+    @Query('search') searchQuery?: string,
   ): Promise<PageDto<Content>> {
-    return await this.contentsService.contentGetAll(pageOptionsDto);
+    return await this.contentsService.contentGetAll(
+      pageOptionsDto,
+      searchQuery,
+    );
   }
 
   @Get(':id')
@@ -78,6 +82,7 @@ export class ContentsController {
   }
 
   @Put(':id')
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateContentById(
@@ -95,6 +100,7 @@ export class ContentsController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 삭제', description: '글을 삭제함' })
   async deleteContentById(

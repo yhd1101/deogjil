@@ -53,6 +53,7 @@ export class CommentTalkContentController {
   }
 
   @Put(':id')
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '댓글수정', description: '댓글수정' })
   async updateComment(
@@ -68,6 +69,7 @@ export class CommentTalkContentController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '댓글삭제', description: '댓글삭제' })
   async deleteComment(

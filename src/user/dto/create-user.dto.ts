@@ -43,7 +43,10 @@ export class CreateUserDto {
   @IsOptional()
   provider?: Provider;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'profile image URL',
+    example: null,
+  })
   @IsOptional()
-  profileImg: string;
+  profileImg?: string;
 }

@@ -5,8 +5,8 @@ services:
     container_name: nginx-prod
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./.cert/cert.pem:/etc/nginx/cert/cert.pem
-        - ./.cert/key.pem:/etc/nginx/cert/key.pem
+      - ./cert/cert.pem:/etc/nginx/cert/cert.pem
+      - ./cert/key.pem:/etc/nginx/cert/key.pem
     ports:
       - 80:80
       - 443:443
