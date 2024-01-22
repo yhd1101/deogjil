@@ -81,18 +81,18 @@ export class TalkcontentsController {
     }
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateTalkContentById(
-    @Body() createTalkcontentDto: CreateTalkcontentDto,
+    @Body() updateTalkcontentDto: UpdateTalkcontentDto,
     @Param('id') id: string,
     @Req() req: RequestWithUserInterface,
   ) {
     return await this.talkcontentsService.talkContentUpdateById(
       id,
-      createTalkcontentDto,
+      updateTalkcontentDto,
       req.user,
     );
   }

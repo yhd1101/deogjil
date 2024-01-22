@@ -81,12 +81,12 @@ export class ContentsController {
     }
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateContentById(
-    @Body() createContentDto: CreateContentDto,
+    @Body() updateContentDto: UpdateContentDto,
     @Param('id') id: string,
     @Req() req: RequestWithUserInterface,
   ) {
@@ -94,7 +94,7 @@ export class ContentsController {
     // 현재 사용자 정보를 서비스 레이어로 전달
     return await this.contentsService.contentUpdateById(
       id,
-      createContentDto,
+      updateContentDto,
       req.user,
     );
   }

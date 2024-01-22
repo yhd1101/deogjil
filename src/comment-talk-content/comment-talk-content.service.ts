@@ -33,7 +33,7 @@ export class CommentTalkContentService {
 
   async commentUpdate(
     id: string,
-    createCommentTalkContentDto: CreateCommentTalkContentDto,
+    updateCommentTalkContentDto: UpdateCommentTalkContentDto,
     user: User,
   ) {
     const comment = await this.commentTalkContentRepository.findOne({
@@ -53,7 +53,7 @@ export class CommentTalkContentService {
 
     await this.commentTalkContentRepository.update(
       id,
-      createCommentTalkContentDto,
+      updateCommentTalkContentDto,
     );
 
     return 'updated comment';

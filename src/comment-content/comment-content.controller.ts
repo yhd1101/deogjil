@@ -51,18 +51,18 @@ export class CommentContentController {
     return newComment;
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '댓글수정', description: '댓글수정' })
   async updateComment(
-    @Body() createCommentContentDto: CreateCommentContentDto,
+    @Body() updateCommentContentDto: UpdateCommentContentDto,
     @Param('id') id: string,
     @Req() req: RequestWithUserInterface,
   ) {
     return await this.commentContentService.commentUpdate(
       id,
-      createCommentContentDto,
+      updateCommentContentDto,
       req.user,
     );
   }

@@ -11,6 +11,7 @@ import { User } from '../user/entities/user.entity';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
+import { UpdateTalkcontentDto } from './dto/update-talkcontent.dto';
 
 @Injectable()
 export class TalkcontentsService {
@@ -67,7 +68,7 @@ export class TalkcontentsService {
 
   async talkContentUpdateById(
     id: string,
-    createTalkContentDto: CreateTalkcontentDto,
+    updateTalkcontentDto: UpdateTalkcontentDto,
     user: User,
   ) {
     const content = await this.talkcontentRepository.findOne({
@@ -88,7 +89,7 @@ export class TalkcontentsService {
       );
     }
 
-    await this.talkcontentRepository.update(id, createTalkContentDto);
+    await this.talkcontentRepository.update(id, updateTalkcontentDto);
     return 'Updated talkContent';
   }
 

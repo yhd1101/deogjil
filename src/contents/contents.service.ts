@@ -31,23 +31,6 @@ export class ContentsService {
     return newContent;
   }
 
-  // async contentGetAll(page: number = 1) {
-  //   const take = 1;
-  //   const queryBuilder = this.contentRepository.createQueryBuilder('content');
-  //   queryBuilder.leftJoinAndSelect('content.writer', 'writer'); // 관계형
-  //
-  //   queryBuilder
-  //     .orderBy('content.createdAt', pageOptionsDto.order)
-  //     .skip(pageOptionsDto.skip)
-  //     .take(pageOptionsDto.take);
-  //
-  //   const itemCount = await queryBuilder.getCount();
-  //   const { entities } = await queryBuilder.getRawAndEntities();
-  //
-  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-  //   return new PageDto(entities, pageMetaDto);
-  // }
-
   async contentGetAll(
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
@@ -57,7 +40,6 @@ export class ContentsService {
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
 
     if (searchQuery) {
-      // 만약 검색 쿼리가 제공되었다면, 제목 또는 설명을 기준으로 결과를 필터링하기 위한 WHERE 절을 추가합니다.
       queryBuilder.where(
         'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery',
         { searchQuery: `%${searchQuery}%` },
@@ -92,7 +74,7 @@ export class ContentsService {
 
   async contentUpdateById(
     id: string,
-    createContentDto: CreateContentDto,
+    updateContentDto: UpdateContentDto,
     user: User,
   ) {
     const content = await this.contentRepository.findOne({
@@ -114,7 +96,7 @@ export class ContentsService {
     }
 
     // 글을 수정
-    await this.contentRepository.update(id, createContentDto);
+    await this.contentRepository.update(id, updateContentDto);
 
     return 'Updated content';
   }
