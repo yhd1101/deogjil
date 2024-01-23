@@ -11,14 +11,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
-  // app.enableCors({
-  //   origin: [
-  //     'http://localhost:8000',
-  //     'http://localhost:8000/api-docs',
-  //     'https://duckfull.duckdns.org',
-  //   ],
-  //   credentials: true,
-  // });
+  app.enableCors({
+    origin: [
+      'http://localhost:8000',
+      'http://localhost:8000/api-docs',
+      'https://duckfull.duckdns.org',
+      'http://localhost:3000',
+    ],
+    credentials: true,
+  });
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
