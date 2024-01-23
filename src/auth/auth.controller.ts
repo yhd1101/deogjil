@@ -91,6 +91,7 @@ export class AuthController {
 
     // 쿠키 설정 및 리다이렉트
     res.setHeader('Set-Cookie', [refreshTokenCookie]);
+    res.setHeader('Authorization', 'Bearer ' + accessToken);
     res.redirect('http://localhost:3000/api/auth/kakao/callback');
     // return { accessToken, user };
   }
