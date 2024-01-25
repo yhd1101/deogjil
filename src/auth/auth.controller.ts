@@ -11,6 +11,9 @@ import {
   HttpStatus,
   Req,
   Res,
+  Query,
+  BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -24,6 +27,7 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '../user/entities/user.entity';
@@ -59,19 +63,69 @@ export class AuthController {
     const { cookie: refreshTokenCookie, refreshToken } =
       await this.authService.generateRefreshToken(user.id);
     await this.userService.setCurrentRefreshToken(refreshToken, user.id);
-    req.res.setHeader('Set-Cookie', [accessToken, refreshTokenCookie]);
+    req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
 
-    return user;
+    return { accessToken, user };
     // return await this.authService.Login(loginUserDto);
   }
 
-  @HttpCode(200)
-  @Get('kakao')
-  @UseGuards(KakaoAuthGuard)
-  async kakaoLogin(): Promise<any> {
-    return HttpStatus.OK;
-  }
+  // @Post('/kakaologin')
+  // async kakaoLogin(@Body() body: any, @Res() res): Promise<any> {
+  //   try {
+  //     const { code, domain } = body;
+  //     if (!code || !domain) {
+  //       throw new BadRequestException('카카오 정보가 없습니다.');
+  //     }
   //
+  //     // 카카오 토큰 조회 후 계정 정보 가져오기
+  //     const kakao = await this.authService.kakaoLogin({ code, domain });
+  //
+  //     console.log(`kakaoUserInfo : ${JSON.stringify(kakao)}`);
+  //     if (!kakao.id) {
+  //       throw new BadRequestException('카카오 정보가 없습니다.');
+  //     }
+  //
+  //     // 카카오 계정 정보를 기반으로 액세스 토큰 및 리프레시 토큰 발급
+  //     const accessToken = await this.authService.generateAccessToken(kakao.id);
+  //     const { cookie: refreshTokenCookie, refreshToken } =
+  //       await this.authService.generateRefreshToken(kakao.id);
+  //     await this.userService.setCurrentRefreshToken(refreshToken, kakao.id);
+  //
+  //     // 리프레시 토큰 쿠키 설정
+  //     res.setHeader('Set-Cookie', [refreshTokenCookie]);
+  //
+  //     // 클라이언트로 액세스 토큰 및 사용자 정보 전달
+  //     res.send({
+  //       accessToken,
+  //       user: kakao,
+  //       message: 'success',
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //     throw new UnauthorizedException();
+  //   }
+  // }
+
+  // @HttpCode(200)
+  // @Get('kakao')
+  // @UseGuards(KakaoAuthGuard)
+  // async kakaoLogin(): Promise<any> {
+  //   return HttpStatus.OK;
+  // }
+
+  @Get('kakao/callback')
+  @UseGuards(KakaoAuthGuard)
+  async handleKakaoCallback(@Req() req: RequestWithUserInterface) {
+    const user = req.user;
+    const accessToken = await this.authService.generateAccessToken(user.id);
+    const { cookie: refreshTokenCookie, refreshToken } =
+      await this.authService.generateRefreshToken(user.id);
+    await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+    req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
+
+    return { accessToken, user };
+  }
+
   // @HttpCode(200)
   // @Get('kakao/callback')
   // @UseGuards(KakaoAuthGuard)
@@ -95,22 +149,44 @@ export class AuthController {
   //   res.redirect('http://localhost:3000/api/auth/kakao/callback');
   //   // return { accessToken, user };
   // }
+  //
 
-  @HttpCode(200)
-  @Get('kakao/callback')
-  @UseGuards(KakaoAuthGuard)
-  async kakaoLoginCallBack(@Req() req: any): Promise<any> {
-    const { user } = req;
-    console.log('111111', user);
-    const accessToken = await this.authService.generateAccessToken(user.id);
-    const { cookie: refreshTokenCookie, refreshToken } =
-      await this.authService.generateRefreshToken(user.id);
-    await this.userService.setCurrentRefreshToken(refreshToken, user.id);
-    user.currentHashedRefreshToken = undefined;
-    req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
-    return { accessToken, user };
-    //return { accessToken, refreshToken, user };
-  }
+  // @HttpCode(200)
+  // @Get('authorize')
+  // @UseGuards(KakaoAuthGuard)
+  // async kakaoauhtorize() {
+  //   return HttpStatus.OK;
+  // }
+  //
+  // @HttpCode(200)
+  // @Get('token')
+  // @UseGuards(KakaoAuthGuard)
+  // async requestToken(@Req() req: any): Promise<any> {
+  //   const { user } = req;
+  //   const accessToken = await this.authService.generateAccessToken(user.id);
+  //   const { cookie: refreshTokenCookie, refreshToken } =
+  //     await this.authService.generateRefreshToken(user.id);
+  //   await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+  //   user.currentHashedRefreshToken = undefined;
+  //   req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
+  //   return { accessToken, user };
+  // }
+
+  // @HttpCode(200)
+  // @Get('kakao/callback')
+  // @UseGuards(KakaoAuthGuard)
+  // async kakaoLoginCallBack(@Req() req: any): Promise<any> {
+  //   const { user } = req;
+  //   console.log('111111', user);
+  //   const accessToken = await this.authService.generateAccessToken(user.id);
+  //   const { cookie: refreshTokenCookie, refreshToken } =
+  //     await this.authService.generateRefreshToken(user.id);
+  //   await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+  //   user.currentHashedRefreshToken = undefined;
+  //   req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
+  //   return { accessToken, user };
+  //   //return { accessToken, refreshToken, user };
+  // }
 
   //refreshtoken api
   @UseGuards(JwtRefreshAuthGuard)
