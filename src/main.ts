@@ -15,7 +15,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:8000',
       'http://localhost:8000/api-docs',
-      'https://duckfull.duckdns.org',
+      'http://duckfull.duckdns.org',
       'http://localhost:3000',
     ],
     credentials: true,
