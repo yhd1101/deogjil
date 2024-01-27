@@ -10,6 +10,7 @@ import { LikesModule } from './likes/likes.module';
 import { TalkcontentsModule } from './talkcontents/talkcontents.module';
 import { CommentContentModule } from './comment-content/comment-content.module';
 import { CommentTalkContentModule } from './comment-talk-content/comment-talk-content.module';
+import { LocalFilesModule } from './local-files/local-files.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentTalkContentModule } from './comment-talk-content/comment-talk-co
     TalkcontentsModule,
     CommentContentModule,
     CommentTalkContentModule,
+    LocalFilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
