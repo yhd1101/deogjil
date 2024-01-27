@@ -7,7 +7,7 @@ export class LocalFile extends CommonEntity {
   filename: string;
 
   @Column()
-  private: string;
+  path: string;
 
   @Column()
   mimetype: string;

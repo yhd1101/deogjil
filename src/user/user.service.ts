@@ -5,11 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { LocalFilesService } from '../local-files/local-files.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private userRepository: Repository<User>,
+    private readonly localFilesService: LocalFilesService,
   ) {}
 
   async CreateUser(createUserDto: CreateUserDto) {
@@ -63,5 +66,14 @@ export class UserService {
     return this.userRepository.update(userId, {
       currentHashedRefreshToken: null,
     });
+  }
+
+  async addAvatar(userId: string, fileData: LocalFileDto) {
+    const avatar = await this.localFilesService.saveLocalFileData(fileData);
+    await this.userRepository.update(userId, {
+      profileImg: 'http//localhost:8000/' + avatar.path,
+    });
+
+    return 'success';
   }
 }
