@@ -1,7 +1,16 @@
-import { Controller, Req, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { Express } from 'express';
+import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
+import LocalFilesInterceptors from '../common/interceptors/localFiles.interceptors';
 
 @Controller('user')
 export class UserController {

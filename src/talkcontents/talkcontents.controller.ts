@@ -63,8 +63,12 @@ export class TalkcontentsController {
   })
   async getAllTalkContents(
     @Query() pageOptionsDto: PageOptionsDto,
+    @Query('search') searchQuery?: string,
   ): Promise<PageDto<Talkcontent>> {
-    return await this.talkcontentsService.talkContentGetAll(pageOptionsDto);
+    return await this.talkcontentsService.talkContentGetAll(
+      pageOptionsDto,
+      searchQuery,
+    );
   }
 
   @Get(':id')

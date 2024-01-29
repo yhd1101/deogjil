@@ -8,5 +8,6 @@ import { LocalFile } from './entities/local-file.entity';
   imports: [TypeOrmModule.forFeature([LocalFile])],
   controllers: [LocalFilesController],
   providers: [LocalFilesService],
+  exports: [LocalFilesService],
 })
 export class LocalFilesModule {}

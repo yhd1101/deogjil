@@ -11,7 +11,6 @@ import { LocalFilesService } from '../local-files/local-files.service';
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    private userRepository: Repository<User>,
     private readonly localFilesService: LocalFilesService,
   ) {}
 

@@ -11,6 +11,7 @@ import { TalkcontentsModule } from './talkcontents/talkcontents.module';
 import { CommentContentModule } from './comment-content/comment-content.module';
 import { CommentTalkContentModule } from './comment-talk-content/comment-talk-content.module';
 import { LocalFilesModule } from './local-files/local-files.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { LocalFilesModule } from './local-files/local-files.module';
     CommentContentModule,
     CommentTalkContentModule,
     LocalFilesModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,6 +12,7 @@ import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
 import { UpdateTalkcontentDto } from './dto/update-talkcontent.dto';
+import { Content } from '../contents/entities/content.entity';
 
 @Injectable()
 export class TalkcontentsService {
@@ -35,18 +36,28 @@ export class TalkcontentsService {
 
   async talkContentGetAll(
     pageOptionsDto: PageOptionsDto,
+    searchQuery?: string,
   ): Promise<PageDto<Talkcontent>> {
     const queryBuilder =
-      await this.talkcontentRepository.createQueryBuilder('talkContents'); //db에 쿼리를직접 해줌
+      await this.talkcontentRepository.createQueryBuilder('talkContents');
     queryBuilder.leftJoinAndSelect('talkContents.writer', 'writer');
+
+    if (searchQuery) {
+      queryBuilder.where(
+        'talkContents.title LIKE :searchQuery OR talkContents.desc LIKE :searchQuery',
+        { searchQuery: `%${searchQuery}%` },
+      );
+    }
 
     await queryBuilder
       .orderBy('talkContents.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take);
+
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
     return new PageDto<Talkcontent>(entities, pageMetaDto);
   }
 

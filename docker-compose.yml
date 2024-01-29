@@ -23,7 +23,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: didgksehd
-      POSTGRES_DB: deogjil
+      POSTGRES_DB: duckful
     networks:
       - backend-networks
 
@@ -41,7 +41,7 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - postgres #상단 이름 인식
+      - postgres
     networks:
       - backend-networks
 
