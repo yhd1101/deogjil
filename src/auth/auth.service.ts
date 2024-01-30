@@ -15,6 +15,8 @@ import * as qs from 'qs';
 import axios from 'axios';
 import { User } from '../user/entities/user.entity';
 import { KakaoAuthStrategy } from './strategies/kakao-auth.strategy';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +34,14 @@ export class AuthService {
     user.password = undefined;
 
     return user;
+  }
+  async profile(id: string) {
+    const userInfo = await this.userService.getUserInfo(id);
+    return userInfo;
+  }
+  async delete(id: string) {
+    const userInfo = await this.userService.deleteByUser(id);
+    return userInfo;
   }
 
   async Login(loginUserDto: LoginUserDto) {

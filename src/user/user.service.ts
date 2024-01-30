@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { LocalFilesService } from '../local-files/local-files.service';
+import { ContentsService } from '../contents/contents.service';
+import { TalkcontentsService } from '../talkcontents/talkcontents.service';
 
 @Injectable()
 export class UserService {
@@ -20,6 +22,13 @@ export class UserService {
     await this.userRepository.save(newSignup);
     return newSignup;
   }
+  async getUserInfo(id: string) {
+    const profile = await this.userRepository.findOne({
+      where: { id },
+      relations: ['content', 'talkContent'],
+    });
+    return profile;
+  }
 
   //user찾기 (by id)
   async getUserById(id: string) {
@@ -28,6 +37,15 @@ export class UserService {
       throw new NotFoundException('No user Id');
     }
     return user;
+  }
+
+  async deleteByUser(id: string) {
+    const user = await this.userRepository.delete(id);
+    if (!user) {
+      throw new NotFoundException('No user');
+    }
+
+    return 'deleted';
   }
 
   //email로 찾기

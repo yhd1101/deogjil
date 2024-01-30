@@ -24,7 +24,9 @@ export class Talkcontent extends CommonEntity {
   })
   public tag?: string[];
 
-  @ManyToOne(() => User, (user: User) => user.talkContent)
+  @ManyToOne(() => User, (user: User) => user.talkContent, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   public writer: User;
 

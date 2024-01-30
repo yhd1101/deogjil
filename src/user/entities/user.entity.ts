@@ -36,12 +36,15 @@ export class User extends CommonEntity {
   @Column({ nullable: true })
   public profileImg?: string;
 
-  @OneToMany(() => Content, (content: Content) => content.writer)
+  @OneToMany(() => Content, (content: Content) => content.writer, {
+    cascade: true,
+  })
   public content: Content[];
 
   @OneToMany(
     () => Talkcontent,
     (talkcontent: Talkcontent) => talkcontent.writer,
+    { cascade: true },
   )
   public talkContent: Talkcontent[];
 
