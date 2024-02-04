@@ -13,11 +13,13 @@ import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { count } from 'rxjs';
+import { CommentContentService } from '../comment-content/comment-content.service';
 
 @Injectable()
 export class ContentsService {
   constructor(
     @InjectRepository(Content) private contentRepository: Repository<Content>,
+    private readonly commentContentService: CommentContentService,
   ) {}
 
   async contentCreate(createContentDto: CreateContentDto, user: User) {
@@ -38,22 +40,35 @@ export class ContentsService {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
-
     if (searchQuery) {
       queryBuilder.where(
-        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery',
+        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery  OR comment.desc LIKE :searchQuery',
         { searchQuery: `%${searchQuery}%` },
       );
     }
 
-    await queryBuilder
-      .orderBy('contents.createdAt', pageOptionsDto.order)
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take);
+    // 기본적으로 최신 글로 정렬
+    queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
+
+    await queryBuilder.skip(pageOptionsDto.skip).take(pageOptionsDto.take);
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
+
+    const contentIdsWithComments =
+      await this.commentContentService.commentGetAll();
+
+    const contentWithCommentCount = entities.map((content) => {
+      const commentCount = contentIdsWithComments.filter(
+        (id) => id === content.id,
+      ).length;
+      return {
+        ...content,
+        commentCount: commentCount,
+      };
+    });
+
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-    return new PageDto<Content>(entities, pageMetaDto);
+    return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
 
   async contentGetById(id: string) {

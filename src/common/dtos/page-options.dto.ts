@@ -7,7 +7,7 @@ export class PageOptionsDto {
   @ApiPropertyOptional({ enum: OrderConstants, default: OrderConstants.ASC })
   @IsEnum(OrderConstants)
   @IsOptional()
-  readonly order?: OrderConstants = OrderConstants.ASC;
+  readonly order?: OrderConstants = OrderConstants.DESC;
 
   @ApiPropertyOptional({
     minimum: 1,

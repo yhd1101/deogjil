@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CommentContent } from './entities/comment-content.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
+import { Content } from '../contents/entities/content.entity';
 
 @Injectable()
 export class CommentContentService {
@@ -16,6 +17,15 @@ export class CommentContentService {
     @InjectRepository(CommentContent)
     private commentContentRepository: Repository<CommentContent>,
   ) {}
+
+  async commentGetAll() {
+    const result = await this.commentContentRepository.find({
+      relations: ['content'],
+    });
+    const contentIds = result.map((comment) => comment.content.id);
+
+    return contentIds;
+  }
 
   async commentCreate(
     createCommentContentDto: CreateCommentContentDto,
@@ -27,11 +37,12 @@ export class CommentContentService {
     });
 
     console.log(newComment);
+    const contentId = createCommentContentDto.content;
 
     await this.commentContentRepository.save(newComment);
+    // 댓글 생성 후, 해당 컨텐츠의 댓글 개수를 업데이트
     return newComment;
   }
-
   async commentUpdate(
     id: string,
     updateCommentContentDto: UpdateCommentContentDto,

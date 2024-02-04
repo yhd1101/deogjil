@@ -1,4 +1,5 @@
-version: "3"
+version: "3.8"
+
 services:
   nginx:
     image: nginx:latest
@@ -8,21 +9,22 @@ services:
       - ./cert/cert.pem:/etc/nginx/cert/cert.pem
       - ./cert/key.pem:/etc/nginx/cert/key.pem
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
     command: /bin/sh -c "nginx -g 'daemon off;'"
     depends_on:
       - nestjs_api
     networks:
       - backend-networks
+
   postgres:
     image: postgres:latest
     container_name: my-postgres-container
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: didgksehd
+      POSTGRES_USER: didgksehd
+      POSTGRES_PASSWORD: za121548
       POSTGRES_DB: duckful
     networks:
       - backend-networks
@@ -39,7 +41,7 @@ services:
       - .env
     command: npm run start:dev
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - postgres
     networks:

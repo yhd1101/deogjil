@@ -67,6 +67,12 @@ export class CommentContentController {
     );
   }
 
+  @Get('/c')
+  async commentGetAll() {
+    const data = await this.commentContentService.commentGetAll();
+    return data;
+  }
+
   @Delete(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
