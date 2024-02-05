@@ -1,5 +1,13 @@
 import { CommonEntity } from '../../common/entities/common.entity';
-import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Like } from '../../likes/entities/like.entity';
 import { CommentContent } from '../../comment-content/entities/comment-content.entity';
@@ -36,4 +44,15 @@ export class Content extends CommonEntity {
     (commentContent: CommentContent) => commentContent.content,
   )
   public comment: CommentContent[];
+
+  @Column({ default: 0 }) // 댓글 갯수를 나타내는 필드
+  public commentCount: number;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  updateCommentCount() {
+    console.log('Updating comment count...');
+    this.commentCount = this.comment ? this.comment.length : 0;
+    console.log('Updated comment count:', this.commentCount);
+  }
 }

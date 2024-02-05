@@ -16,6 +16,8 @@ export class CommentContentService {
   constructor(
     @InjectRepository(CommentContent)
     private commentContentRepository: Repository<CommentContent>,
+    @InjectRepository(Content)
+    private readonly contentRepository: Repository<Content>,
   ) {}
 
   async commentGetAll() {
@@ -40,9 +42,34 @@ export class CommentContentService {
     const contentId = createCommentContentDto.content;
 
     await this.commentContentRepository.save(newComment);
-    // 댓글 생성 후, 해당 컨텐츠의 댓글 개수를 업데이트
+
+    // 해당 컨텐츠의 댓글 개수를 업데이트
+    await this.contentRepository
+      .createQueryBuilder()
+      .update(Content)
+      .set({ commentCount: () => '"commentCount" + 1' }) // 댓글 개수 증가
+      .where('id = :contentId', { contentId })
+      .execute();
+
     return newComment;
   }
+
+  // async commentCreate(
+  //   createCommentContentDto: CreateCommentContentDto,
+  //   user: User,
+  // ) {
+  //   const newComment = await this.commentContentRepository.create({
+  //     ...createCommentContentDto,
+  //     writer: user,
+  //   });
+  //
+  //   console.log(newComment);
+  //   const contentId = createCommentContentDto.content;
+  //
+  //   await this.commentContentRepository.save(newComment);
+  //   // 댓글 생성 후, 해당 컨텐츠의 댓글 개수를 업데이트
+  //   return newComment;
+  // }
   async commentUpdate(
     id: string,
     updateCommentContentDto: UpdateCommentContentDto,

@@ -36,36 +36,30 @@ export class ContentsService {
   async contentGetAll(
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
+    sortType?: string,
   ): Promise<PageDto<Content>> {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
+
     if (searchQuery) {
       queryBuilder.where(
-        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery  OR comment.desc LIKE :searchQuery',
+        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery',
         { searchQuery: `%${searchQuery}%` },
       );
     }
 
-    // 기본적으로 최신 글로 정렬
-    queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
+    if (sortType === 'commentcount') {
+      queryBuilder.addOrderBy('contents.commentCount', 'DESC');
+    } else {
+      queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
+    }
 
-    await queryBuilder.skip(pageOptionsDto.skip).take(pageOptionsDto.take);
-    const itemCount = await queryBuilder.getCount();
-    const { entities } = await queryBuilder.getRawAndEntities();
-
-    const contentIdsWithComments =
-      await this.commentContentService.commentGetAll();
-
-    const contentWithCommentCount = entities.map((content) => {
-      const commentCount = contentIdsWithComments.filter(
-        (id) => id === content.id,
-      ).length;
-      return {
-        ...content,
-        commentCount: commentCount,
-      };
-    });
+    // 페이지네이션 로직을 여기서 수행
+    const [contentWithCommentCount, itemCount] = await queryBuilder
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .getManyAndCount();
 
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
