@@ -47,12 +47,4 @@ export class Content extends CommonEntity {
 
   @Column({ default: 0 }) // 댓글 갯수를 나타내는 필드
   public commentCount: number;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  updateCommentCount() {
-    console.log('Updating comment count...');
-    this.commentCount = this.comment ? this.comment.length : 0;
-    console.log('Updated comment count:', this.commentCount);
-  }
 }

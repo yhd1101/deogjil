@@ -20,6 +20,11 @@ import * as Joi from '@hapi/joi';
 
         KAKAO_AUTH_CLIENTID: Joi.string().required(),
         KAKAO_AUTH_CALLBACK_URL: Joi.string().required(),
+
+        AWS_S3_ACCESS_KEY: Joi.string().required(),
+        AWS_S3_SECRET_KEY: Joi.string().required(),
+        AWS_S3_REGION: Joi.string().required(),
+        AWS_S3_BUCKET_NAME: Joi.string().required(),
       }),
     }),
   ],

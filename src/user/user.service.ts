@@ -87,10 +87,8 @@ export class UserService {
 
   async addAvatar(userId: string, fileData: LocalFileDto) {
     const avatar = await this.localFilesService.saveLocalFileData(fileData);
-    await this.userRepository.update(userId, {
+    return await this.userRepository.update(userId, {
       profileImg: 'http//localhost:8000/' + avatar.path,
     });
-
-    return 'success';
   }
 }

@@ -11,6 +11,8 @@ import {
   Query,
   NotFoundException,
   Put,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
@@ -27,6 +29,8 @@ import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Content } from './entities/content.entity';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from '../common/utils/multer.options';
 
 @ApiTags('Content')
 @Controller('content')
@@ -44,13 +48,17 @@ export class ContentsController {
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('contents')))
   async createContent(
     @Req() req: RequestWithUserInterface,
     @Body() createContentDto: CreateContentDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
+    console.log('22222', files);
     const newContent = await this.contentsService.contentCreate(
       createContentDto,
       req.user,
+      files,
     );
     return newContent;
   }
@@ -110,5 +118,17 @@ export class ContentsController {
     @Req() req: RequestWithUserInterface,
   ) {
     return await this.contentsService.contentDeleteById(id, req.user);
+  }
+  @Post('upload')
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('contents'))) //files = frontend 보낼때 키값
+  @UseGuards(JwtAccessAuthGuard)
+  uploadFile(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Req() req: RequestWithUserInterface,
+  ) {
+    console.log(files);
+    return {
+      image: `http://localhost:8000/media/content/${files[0].filename}`,
+    };
   }
 }

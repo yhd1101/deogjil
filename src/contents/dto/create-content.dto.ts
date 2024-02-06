@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateContentDto {
   @ApiProperty({
@@ -7,7 +7,6 @@ export class CreateContentDto {
     default: 'title',
   })
   @IsString()
-  @IsNotEmpty()
   title: string;
 
   @ApiProperty({
@@ -15,15 +14,7 @@ export class CreateContentDto {
     default: 'default',
   })
   @IsString()
-  @IsNotEmpty()
   desc: string;
-
-  @ApiProperty({
-    description: 'insert Image',
-    default: ['img'],
-  })
-  @IsArray()
-  img?: string[];
 
   @ApiProperty({
     description: 'insert tag',
