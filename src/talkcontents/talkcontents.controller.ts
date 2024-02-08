@@ -11,6 +11,8 @@ import {
   Query,
   Put,
   NotFoundException,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { TalkcontentsService } from './talkcontents.service';
 import { CreateTalkcontentDto } from './dto/create-talkcontent.dto';
@@ -28,6 +30,8 @@ import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Talkcontent } from './entities/talkcontent.entity';
 import { CreateContentDto } from '../contents/dto/create-content.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from '../common/utils/multer.options';
 
 @ApiTags('talkContents')
 @Controller('talkcontents')
@@ -45,13 +49,16 @@ export class TalkcontentsController {
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('talkContents')))
   async createContent(
     @Req() req: RequestWithUserInterface,
     @Body() createTalkcontentDto: CreateTalkcontentDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     const newContent = await this.talkcontentsService.talkContentCreate(
       createTalkcontentDto,
       req.user,
+      files,
     );
     return newContent;
   }
@@ -64,10 +71,14 @@ export class TalkcontentsController {
   async getAllTalkContents(
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
+    @Query('sortType') sortType?: string,
+    @Query('tag') tag?: string,
   ): Promise<PageDto<Talkcontent>> {
     return await this.talkcontentsService.talkContentGetAll(
       pageOptionsDto,
       searchQuery,
+      sortType,
+      tag,
     );
   }
 

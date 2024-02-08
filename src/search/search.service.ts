@@ -12,20 +12,30 @@ export class SearchService {
     private readonly talkcontentsService: TalkcontentsService,
   ) {}
 
-  // async search(query: string, pageOptionsDto: PageOptionsDto): Promise<any> {
-  //   const [contentsResult, talkContentsResults] = await Promise.all([
-  //     this.contentsService.contentGetAll(pageOptionsDto, query),
-  //     this.talkcontentsService.talkContentGetAll(pageOptionsDto, query),
-  //   ]);
-  //
-  //   const combinedResult = {
-  //     contents: contentsResult,
-  //     talContents: talkContentsResults,
-  //     metadata: {
-  //       totalResults: contentsResult.meta + talkContentsResults.meta,
-  //     },
-  //   };
+  async search(
+    query: string,
+    sortType: string,
+    tag: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<any> {
+    const [contentsResult, talkContentsResults] = await Promise.all([
+      this.contentsService.contentGetAll(pageOptionsDto, query, sortType, tag),
+      this.talkcontentsService.talkContentGetAll(
+        pageOptionsDto,
+        query,
+        sortType,
+        tag,
+      ),
+    ]);
 
-  //   return combinedResult;
-  // }
+    const combinedResult = {
+      contents: contentsResult,
+      talContents: talkContentsResults,
+      metadata: {
+        totalResults: contentsResult.meta + talkContentsResults.meta,
+      },
+    };
+
+    return combinedResult;
+  }
 }

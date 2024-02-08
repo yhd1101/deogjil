@@ -10,12 +10,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CommentTalkContent } from './entities/comment-talk-content.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
+import { Talkcontent } from '../talkcontents/entities/talkcontent.entity';
 
 @Injectable()
 export class CommentTalkContentService {
   constructor(
     @InjectRepository(CommentTalkContent)
     private commentTalkContentRepository: Repository<CommentTalkContent>,
+    @InjectRepository(Talkcontent)
+    private readonly talkcontentRepository: Repository<Talkcontent>,
   ) {}
 
   async commentCreate(
@@ -26,8 +29,16 @@ export class CommentTalkContentService {
       ...createCommentTalkContentDto,
       writer: user,
     });
+    const contentId = createCommentTalkContentDto.talkContent;
 
     await this.commentTalkContentRepository.save(newComment);
+
+    await this.talkcontentRepository
+      .createQueryBuilder()
+      .update(Talkcontent)
+      .set({ commentCount: () => '"commentCount" + 1' }) // 댓글 개수 증가
+      .where('id = :talkContentId', { contentId })
+      .execute();
     return newComment;
   }
 

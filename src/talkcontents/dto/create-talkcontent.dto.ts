@@ -19,13 +19,6 @@ export class CreateTalkcontentDto {
   desc: string;
 
   @ApiProperty({
-    description: 'insert Image',
-    default: ['img'],
-  })
-  @IsArray()
-  img?: string[];
-
-  @ApiProperty({
     description: 'insert tag',
     default: ['Marble'],
   })

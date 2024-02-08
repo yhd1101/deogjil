@@ -1,9 +1,7 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
@@ -15,7 +13,6 @@ import { UpdateLikeDto } from './dto/update-like.dto';
 import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateTalkLikeDto } from './dto/create-talkLike.dto';
 
 @ApiTags('Like')
 @Controller('like')
@@ -25,8 +22,8 @@ export class LikesController {
   @Post('create')
   @ApiBody({ type: CreateLikeDto })
   @ApiOperation({
-    summary: '좋아요기능',
-    description: '좋아요기능',
+    summary: '덕질자랑 좋아요기능',
+    description: '덕질자랑좋아요기능',
   })
   @ApiOperation({
     description: 'Like',

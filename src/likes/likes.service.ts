@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateLikeDto } from './dto/create-like.dto';
 import { UpdateLikeDto } from './dto/update-like.dto';
@@ -13,8 +12,6 @@ import { Like } from './entities/like.entity';
 import { Repository, getConnection } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { Content } from '../contents/entities/content.entity';
-import { Talkcontent } from '../talkcontents/entities/talkcontent.entity';
-import { CreateTalkLikeDto } from './dto/create-talkLike.dto';
 
 @Injectable()
 export class LikesService {

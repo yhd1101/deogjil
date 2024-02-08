@@ -108,9 +108,15 @@ export class CommentContentService {
         'You do not have permission to delete this comment',
       );
     }
+    const contentId = comment.content.id;
 
     await this.commentContentRepository.delete(id);
-
+    await this.contentRepository
+      .createQueryBuilder()
+      .update(Content)
+      .set({ commentCount: () => '"commentCount" - 1' }) // 댓글 개수 증가
+      .where('id = :contentId', { contentId })
+      .execute();
     return 'deleted';
   }
 }

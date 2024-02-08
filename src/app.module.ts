@@ -12,6 +12,7 @@ import { CommentContentModule } from './comment-content/comment-content.module';
 import { CommentTalkContentModule } from './comment-talk-content/comment-talk-content.module';
 import { LocalFilesModule } from './local-files/local-files.module';
 import { SearchModule } from './search/search.module';
+import { LikeTalkContentModule } from './like-talk-content/like-talk-content.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SearchModule } from './search/search.module';
     CommentTalkContentModule,
     LocalFilesModule,
     SearchModule,
+    LikeTalkContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

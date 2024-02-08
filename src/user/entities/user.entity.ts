@@ -14,6 +14,7 @@ import { Like } from '../../likes/entities/like.entity';
 import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 import { CommentContent } from '../../comment-content/entities/comment-content.entity';
 import { CommentTalkContent } from '../../comment-talk-content/entities/comment-talk-content.entity';
+import { LikeTalkContent } from '../../like-talk-content/entities/like-talk-content.entity';
 
 @Entity()
 export class User extends CommonEntity {
@@ -56,6 +57,12 @@ export class User extends CommonEntity {
 
   @OneToMany(() => Like, (like: Like) => like.user)
   public like: Like[];
+
+  @OneToMany(
+    () => LikeTalkContent,
+    (likeTalkContent: LikeTalkContent) => likeTalkContent.user,
+  )
+  public likeTalkContent: LikeTalkContent[];
 
   @OneToMany(
     () => CommentContent,
