@@ -12,15 +12,8 @@ export class Like extends CommonEntity {
 
   @ManyToOne(() => Content, (content: Content) => content.like, {
     nullable: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn()
   public content?: Content;
-
-  @ManyToOne(
-    () => Talkcontent,
-    (talkcontent: Talkcontent) => talkcontent.like,
-    { nullable: true },
-  )
-  @JoinColumn()
-  public talkContent?: Talkcontent;
 }

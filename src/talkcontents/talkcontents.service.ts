@@ -12,7 +12,6 @@ import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
 import { UpdateTalkcontentDto } from './dto/update-talkcontent.dto';
-import { Content } from '../contents/entities/content.entity';
 
 @Injectable()
 export class TalkcontentsService {
@@ -73,8 +72,7 @@ export class TalkcontentsService {
       .where('talkContent.id= :id', { id })
       .getOne();
 
-    const count = talkContet.like.length;
-    return { talkContent, likeCount: count };
+    return { talkContent };
   }
 
   async talkContentUpdateById(

@@ -12,20 +12,20 @@ export class SearchService {
     private readonly talkcontentsService: TalkcontentsService,
   ) {}
 
-  async search(query: string, pageOptionsDto: PageOptionsDto): Promise<any> {
-    const [contentsResult, talkContentsResults] = await Promise.all([
-      this.contentsService.contentGetAll(pageOptionsDto, query),
-      this.talkcontentsService.talkContentGetAll(pageOptionsDto, query),
-    ]);
+  // async search(query: string, pageOptionsDto: PageOptionsDto): Promise<any> {
+  //   const [contentsResult, talkContentsResults] = await Promise.all([
+  //     this.contentsService.contentGetAll(pageOptionsDto, query),
+  //     this.talkcontentsService.talkContentGetAll(pageOptionsDto, query),
+  //   ]);
+  //
+  //   const combinedResult = {
+  //     contents: contentsResult,
+  //     talContents: talkContentsResults,
+  //     metadata: {
+  //       totalResults: contentsResult.meta + talkContentsResults.meta,
+  //     },
+  //   };
 
-    const combinedResult = {
-      contents: contentsResult,
-      talContents: talkContentsResults,
-      metadata: {
-        totalResults: contentsResult.meta + talkContentsResults.meta,
-      },
-    };
-
-    return combinedResult;
-  }
+  //   return combinedResult;
+  // }
 }

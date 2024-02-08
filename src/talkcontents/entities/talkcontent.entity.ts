@@ -30,9 +30,6 @@ export class Talkcontent extends CommonEntity {
   @JoinColumn()
   public writer: User;
 
-  @OneToMany(() => Like, (like: Like) => like.talkContent)
-  public like: Like[];
-
   @OneToMany(
     () => CommentTalkContent,
     (commentTalkContent: CommentTalkContent) => commentTalkContent.talkContent,

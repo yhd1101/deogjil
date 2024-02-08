@@ -11,12 +11,4 @@ export class CreateLikeDto {
   })
   @IsOptional()
   content?: Content;
-
-  @ApiProperty({
-    description: 'insert talkContent',
-    example: { id: 'talkContentId' }, // 예제 값 설정
-    required: false,
-  })
-  @IsOptional()
-  talkContent?: Talkcontent;
 }

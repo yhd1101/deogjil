@@ -36,15 +36,19 @@ export class Content extends CommonEntity {
   @JoinColumn()
   public writer: User;
 
-  @OneToMany(() => Like, (like: Like) => like.content)
+  @OneToMany(() => Like, (like: Like) => like.content, { cascade: true })
   public like: Like[];
 
   @OneToMany(
     () => CommentContent,
     (commentContent: CommentContent) => commentContent.content,
+    { cascade: true },
   )
   public comment: CommentContent[];
 
   @Column({ default: 0 }) // 댓글 갯수를 나타내는 필드
   public commentCount: number;
+
+  @Column({ default: 0 })
+  public likeCount: number;
 }

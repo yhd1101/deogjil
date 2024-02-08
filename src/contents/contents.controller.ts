@@ -13,6 +13,7 @@ import {
   Put,
   UseInterceptors,
   UploadedFiles,
+  BadRequestException,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
@@ -69,11 +70,13 @@ export class ContentsController {
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
     @Query('sortType') sortType?: string,
+    @Query('tag') tag?: string,
   ): Promise<PageDto<Content>> {
     return await this.contentsService.contentGetAll(
       pageOptionsDto,
       searchQuery,
       sortType,
+      tag,
     );
   }
 
@@ -94,11 +97,13 @@ export class ContentsController {
   @Patch(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('contents')))
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateContentById(
     @Body() updateContentDto: UpdateContentDto,
     @Param('id') id: string,
     @Req() req: RequestWithUserInterface,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     console.log('dddd', id);
     // 현재 사용자 정보를 서비스 레이어로 전달
@@ -106,6 +111,7 @@ export class ContentsController {
       id,
       updateContentDto,
       req.user,
+      files,
     );
   }
 
@@ -118,17 +124,5 @@ export class ContentsController {
     @Req() req: RequestWithUserInterface,
   ) {
     return await this.contentsService.contentDeleteById(id, req.user);
-  }
-  @Post('upload')
-  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('contents'))) //files = frontend 보낼때 키값
-  @UseGuards(JwtAccessAuthGuard)
-  uploadFile(
-    @UploadedFiles() files: Array<Express.Multer.File>,
-    @Req() req: RequestWithUserInterface,
-  ) {
-    console.log(files);
-    return {
-      image: `http://localhost:8000/media/content/${files[0].filename}`,
-    };
   }
 }

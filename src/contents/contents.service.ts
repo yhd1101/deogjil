@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -12,34 +13,118 @@ import { User } from '../user/entities/user.entity';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageMetaDto } from '../common/dtos/page-meta.dto';
 import { PageDto } from '../common/dtos/page.dto';
-import { count } from 'rxjs';
-import { CommentContentService } from '../comment-content/comment-content.service';
+import { ConfigService } from '@nestjs/config';
+import * as AWS from 'aws-sdk';
+import { PromiseResult } from 'aws-sdk/lib/request';
+import * as path from 'path';
 
 @Injectable()
 export class ContentsService {
+  private readonly awsS3: AWS.S3;
+  public readonly S3_BUCKET_NAME: string;
   constructor(
     @InjectRepository(Content) private contentRepository: Repository<Content>,
-    private readonly commentContentService: CommentContentService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.awsS3 = new AWS.S3({
+      accessKeyId: this.configService.get('AWS_S3_ACCESS_KEY'), // process.env.AWS_S3_ACCESS_KEY
+      secretAccessKey: this.configService.get('AWS_S3_SECRET_KEY'),
+      region: this.configService.get('AWS_S3_REGION'),
+    });
+    this.S3_BUCKET_NAME = this.configService.get('AWS_S3_BUCKET_NAME');
+  }
 
   async contentCreate(
     createContentDto: CreateContentDto,
     user: User,
     files: Express.Multer.File[],
   ) {
-    console.log('dddd', files);
-    const uploadedImageUrls = await this.uploadImg(files);
-    console.log(uploadedImageUrls);
-    const newContent = await this.contentRepository.create({
-      ...createContentDto,
-      writer: user,
-      img: uploadedImageUrls,
-    });
-    console.log('21313123123', newContent);
-    console.log('222');
-    await this.contentRepository.save(newContent);
+    try {
+      // 이미지 업로드 및 URL 가져오기
+      const uploadedImageUrls = await Promise.all(
+        files.map(async (file) => {
+          const { key, contentType } = await this.uploadFileToS3(
+            'content',
+            file,
+          );
+          return this.getAwsS3FileUrl(key);
+        }),
+      );
 
-    return newContent;
+      // 새로운 콘텐츠 생성
+      const newContent = await this.contentRepository.create({
+        ...createContentDto,
+        writer: user,
+        img: uploadedImageUrls, // 이미지 URL을 img 필드에 추가
+      });
+
+      // 콘텐츠 저장
+      await this.contentRepository.save(newContent);
+
+      return newContent;
+    } catch (error) {
+      // 오류 처리
+      console.error('Error creating content:', error);
+      throw new BadRequestException('Failed to create content');
+    }
+  }
+
+  async uploadFileToS3(
+    folder: string,
+    file: Express.Multer.File,
+  ): Promise<{
+    key: string;
+    s3Object: PromiseResult<AWS.S3.PutObjectOutput, AWS.AWSError>;
+    contentType: string;
+  }> {
+    try {
+      const key = `${folder}/${Date.now()}_${path.basename(
+        file.originalname,
+      )}`.replace(/ /g, '');
+
+      const s3Object = await this.awsS3
+        .putObject({
+          Bucket: this.S3_BUCKET_NAME,
+          Key: key,
+          Body: file.buffer,
+          ACL: 'public-read',
+          ContentType: file.mimetype,
+        })
+        .promise();
+      return { key, s3Object, contentType: file.mimetype };
+    } catch (error) {
+      throw new BadRequestException(`File upload failed : ${error}`);
+    }
+  }
+  private async deleteS3Objects(keys: string[]) {
+    await Promise.all(
+      keys.map(async (key) => {
+        await this.deleteS3Object(key);
+      }),
+    );
+  }
+
+  async deleteS3Object(
+    key: string,
+    callback?: (err: AWS.AWSError, data: AWS.S3.DeleteObjectOutput) => void,
+  ): Promise<void> {
+    try {
+      await this.awsS3
+        .deleteObject(
+          {
+            Bucket: this.S3_BUCKET_NAME,
+            Key: key,
+          },
+          callback,
+        )
+        .promise();
+    } catch (error) {
+      throw new BadRequestException(`Failed to delete file : ${error}`);
+    }
+  }
+
+  public getAwsS3FileUrl(objectKey: string) {
+    return `https://${this.S3_BUCKET_NAME}.s3.amazonaws.com/${objectKey}`;
   }
 
   async uploadImg(files: Express.Multer.File[]) {
@@ -67,6 +152,7 @@ export class ContentsService {
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
     sortType?: string,
+    tag?: string,
   ): Promise<PageDto<Content>> {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
@@ -79,10 +165,20 @@ export class ContentsService {
       );
     }
 
-    if (sortType === 'commentcount') {
-      queryBuilder.addOrderBy('contents.commentCount', 'DESC');
-    } else {
-      queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
+    if (tag) {
+      // tag가 주어진 경우 해당하는 태그가 포함된 컨텐츠를 검색
+      queryBuilder.andWhere(':tag = ANY(contents.tag)', { tag });
+    }
+    switch (sortType) {
+      case 'like':
+        queryBuilder.addOrderBy('contents.likeCount', 'DESC');
+        break;
+      case 'commentcount':
+        queryBuilder.addOrderBy('contents.commentCount', 'DESC');
+        break;
+      default:
+        queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
+        break;
     }
 
     // 페이지네이션 로직을 여기서 수행
@@ -96,10 +192,6 @@ export class ContentsService {
   }
 
   async contentGetById(id: string) {
-    const content1 = await this.contentRepository.findOne({
-      where: { id },
-      relations: ['like'],
-    });
     const content = await this.contentRepository
       .createQueryBuilder('content')
       .leftJoinAndSelect('content.writer', 'writer')
@@ -107,55 +199,158 @@ export class ContentsService {
       .where('content.id= :id', { id })
       .getOne();
 
-    const count = content1.like.length;
-    return { content, likeCount: count };
+    return { content };
   }
+
+  // async contentUpdateById(
+  //   id: string,
+  //   updateContentDto: UpdateContentDto,
+  //   user: User,
+  //   files: Express.Multer.File[],
+  // ) {
+  //   const content = await this.contentRepository.findOne({
+  //     where: { id },
+  //     relations: ['writer'],
+  //   });
+  //
+  //   if (!content) {
+  //     // 글이 없는 경우 NotFoundException을 던짐
+  //     throw new NotFoundException('Content not found');
+  //   }
+  //
+  //   // 사용자가 글의 작성자인지 확인
+  //   if (content.writer.id !== user.id) {
+  //     // 권한이 없는 경우 ForbiddenException을 던짐
+  //     throw new ForbiddenException(
+  //       'You do not have permission to update this content',
+  //     );
+  //   }
+  //
+  //   await this.deleteS3Objects(content.img);
+  //
+  //   // // 업로드된 이미지 파일을 S3에서 삭제
+  //   // await Promise.all(
+  //   //   content.img.map(async (imageUrl) => {
+  //   //     const key = this.extractS3KeyFromUrl(imageUrl);
+  //   //     console.log(key);
+  //   //     await this.deleteS3Object(key);
+  //   //   }),
+  //   // );
+  //
+  //   // 새로운 이미지 파일을 업로드하고 URL 얻기
+  //   const uploadedImageUrls = await Promise.all(
+  //     files.map(async (file) => {
+  //       const { key, contentType } = await this.uploadFileToS3('content', file);
+  //       return this.getAwsS3FileUrl(key);
+  //     }),
+  //   );
+  //
+  //   // 글을 업데이트
+  //   await this.contentRepository.update(id, {
+  //     ...updateContentDto,
+  //     img: uploadedImageUrls, // 새로운 이미지 URL로 업데이트
+  //   });
+  //
+  //   return 'Updated content';
+  // }
 
   async contentUpdateById(
     id: string,
     updateContentDto: UpdateContentDto,
     user: User,
+    files: Express.Multer.File[],
   ) {
-    const content = await this.contentRepository.findOne({
-      where: { id },
-      relations: ['writer'],
-    });
+    try {
+      const content = await this.contentRepository.findOne({
+        where: { id },
+        relations: ['writer'],
+      });
 
-    if (!content) {
-      // 글이 없는 경우 NotFoundException을 던짐
-      throw new NotFoundException('Content not found');
-    }
+      if (!content) {
+        throw new NotFoundException('Content not found');
+      }
 
-    // 사용자가 글의 작성자인지 확인
-    if (content.writer.id !== user.id) {
-      // 권한이 없는 경우 ForbiddenException을 던짐
-      throw new ForbiddenException(
-        'You do not have permission to update this content',
+      if (content.writer.id !== user.id) {
+        throw new ForbiddenException(
+          'You do not have permission to update this content',
+        );
+      }
+
+      // 업로드된 이미지 파일을 S3에서 삭제
+      await Promise.all(
+        content.img.map(async (imageUrl) => {
+          const key = this.extractS3KeyFromUrl(imageUrl);
+          console.log(key);
+          await this.deleteS3Object(key);
+        }),
       );
+
+      // 새로운 이미지 파일을 업로드하고 URL 얻기
+      const uploadedImageUrls = await Promise.all(
+        files.map(async (file) => {
+          const { key, contentType } = await this.uploadFileToS3(
+            'content',
+            file,
+          );
+          return this.getAwsS3FileUrl(key);
+        }),
+      );
+
+      // 글을 업데이트
+      await this.contentRepository.update(id, {
+        ...updateContentDto,
+        img: uploadedImageUrls, // 새로운 이미지 URL로 업데이트
+      });
+
+      return 'Updated content';
+    } catch (error) {
+      console.error('Error updating content:', error);
+      throw new BadRequestException('Failed to update content');
     }
+  }
 
-    // 글을 수정
-    await this.contentRepository.update(id, updateContentDto);
-
-    return 'Updated content';
+  private extractS3KeyFromUrl(url: string): string {
+    const urlParts = url.split('/');
+    return urlParts[urlParts.length - 1];
   }
 
   async contentDeleteById(id: string, user: User) {
-    const content = await this.contentRepository.findOne({
-      where: { id },
-      relations: ['writer'],
-    });
-    if (!content) {
-      throw new NotFoundException('Content Not Found');
-    }
+    try {
+      const content = await this.contentRepository.findOne({
+        where: { id },
+        relations: ['writer'],
+      });
 
-    if (content.writer.id !== user.id) {
-      throw new ForbiddenException(
-        'You do not have permission to delete this content',
-      );
-    }
+      if (!content) {
+        throw new NotFoundException('Content Not Found');
+      }
 
-    await this.contentRepository.delete(id);
-    return 'deleted';
+      if (content.writer.id !== user.id) {
+        throw new ForbiddenException(
+          'You do not have permission to delete this content',
+        );
+      }
+
+      // 업로드된 이미지 파일을 S3에서 삭제
+      for (const imageUrl of content.img) {
+        try {
+          const key = this.extractS3KeyFromUrl(imageUrl);
+          await this.awsS3
+            .deleteObject({
+              Bucket: this.S3_BUCKET_NAME,
+              Key: key,
+            })
+            .promise();
+        } catch (error) {
+          console.error('Error deleting S3 object:', error);
+          // 이미지 삭제에 실패하더라도 계속 진행
+        }
+      }
+      await this.contentRepository.delete(id);
+      return 'deleted';
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      throw new BadRequestException('Failed to delete content');
+    }
   }
 }

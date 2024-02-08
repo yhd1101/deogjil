@@ -43,43 +43,11 @@ export class LikesController {
     );
     return likeCount;
   }
-
-  // @Post('create')
-  // @ApiBody({ type: CreateLikeDto })
-  // @ApiOperation({
-  //   summary: '좋아요기능',
-  //   description: '좋아요기능',
-  // })
-  // @ApiOperation({
-  //   description: 'like',
-  // })
-  // @ApiBearerAuth('access-token')
-  // @UseGuards(JwtAccessAuthGuard)
-  // async likeContent(
-  //   @Req() req: RequestWithUserInterface,
-  //   @Body() createLikeDto: CreateLikeDto,
-  // ) {
-  //   const likeCount = await this.likesService.likeContent(
-  //     req.user,
-  //     createLikeDto,
-  //   );
-  //   return likeCount;
-  // }
-
-  // @Post('like/:category')
-  // @ApiBody({ type: CreateTalkLikeDto })
-  // @ApiOperation({
-  //   summary: '토크 좋아요기능',
-  //   description: '토크좋아요기능',
-  // })
-  // @ApiOperation({
-  //   description: 'like',
-  // })
-  // @ApiBearerAuth('access-token')
-  // @UseGuards(JwtAccessAuthGuard)
-  // async talkContentLike(
-  //   @Param('category') category: string,
-  //   @Req() req: RequestWithUserInterface,
-  //   @Body() createTalkLikeDto: CreateTalkLikeDto,
-  // ) {}
+  @Delete(':id')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: '좋아요 취소', description: ' 좋아요취소' })
+  async likeDelete(@Param('id') id: string) {
+    await this.likesService.deleteLike(id);
+  }
 }

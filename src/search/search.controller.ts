@@ -18,12 +18,12 @@ import { PageDto } from '../common/dtos/page.dto';
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
-  @Get()
-  async search(
-    @Query('query') query: string,
-    @Query() pageOptionsDto: PageOptionsDto,
-  ): Promise<PageDto<any>> {
-    const result = await this.searchService.search(query, pageOptionsDto);
-    return result;
-  }
+  // @Get()
+  // async search(
+  //   @Query('query') query: string,
+  //   @Query() pageOptionsDto: PageOptionsDto,
+  // ): Promise<PageDto<any>> {
+  //   const result = await this.searchService.search(query, pageOptionsDto);
+  //   return result;
+  // }
 }
