@@ -32,11 +32,13 @@ export class AuthService {
       provider: Provider.LOCAL,
     });
     user.password = undefined;
+    console.log(user);
 
     return user;
   }
   async profile(id: string) {
     const userInfo = await this.userService.getUserInfo(id);
+
     return userInfo;
   }
   async delete(id: string) {

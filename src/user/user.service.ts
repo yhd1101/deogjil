@@ -1,24 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { LocalFilesService } from '../local-files/local-files.service';
-import { ContentsService } from '../contents/contents.service';
-import { TalkcontentsService } from '../talkcontents/talkcontents.service';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    private readonly localFilesService: LocalFilesService,
   ) {}
 
   async CreateUser(createUserDto: CreateUserDto) {
     const newSignup = await this.userRepository.create(createUserDto);
     // newSignup.provider = Provider.LOCAL;
+    // 현재 시간을 얻어옴
+    // const currentDateTime = new Date();
+    // // 한국 시간대에 +9:00을 더함
+    // const koreaTime = new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000);
+    //
+    // newSignup.createdAt = koreaTime;
+    // newSignup.updatedAt = koreaTime;
+    console.log(newSignup.createdAt);
     await this.userRepository.save(newSignup);
     return newSignup;
   }
@@ -27,6 +31,7 @@ export class UserService {
       where: { id },
       relations: ['content', 'talkContent'],
     });
+    console.log(profile);
     return profile;
   }
 
@@ -82,13 +87,6 @@ export class UserService {
   async removeRefreshToken(userId: string) {
     return this.userRepository.update(userId, {
       currentHashedRefreshToken: null,
-    });
-  }
-
-  async addAvatar(userId: string, fileData: LocalFileDto) {
-    const avatar = await this.localFilesService.saveLocalFileData(fileData);
-    return await this.userRepository.update(userId, {
-      profileImg: 'http//localhost:8000/' + avatar.path,
     });
   }
 }

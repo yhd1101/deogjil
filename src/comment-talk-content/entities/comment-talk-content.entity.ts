@@ -5,13 +5,18 @@ import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 
 @Entity()
 export class CommentTalkContent extends CommonEntity {
-  @ManyToOne(() => User, (user: User) => user.commentTalkComment)
+  @ManyToOne(() => User, (user: User) => user.commentTalkComment, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   public writer: User;
 
   @ManyToOne(
     () => Talkcontent,
     (talkcontent: Talkcontent) => talkcontent.comment,
+    {
+      onDelete: 'CASCADE',
+    },
   )
   @JoinColumn()
   public talkContent: Talkcontent;

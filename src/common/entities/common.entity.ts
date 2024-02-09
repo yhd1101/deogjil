@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   CreateDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,4 +14,14 @@ export abstract class CommonEntity {
 
   @UpdateDateColumn()
   public updatedAt: Date;
+
+  @BeforeInsert()
+  updateTimestamps() {
+    // 현재 시간을 얻어옴
+    const currentDateTime = new Date();
+
+    // 한국 시간대에 +9:00을 더함
+    this.createdAt = new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000);
+    this.updatedAt = new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000);
+  }
 }

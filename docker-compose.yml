@@ -17,17 +17,19 @@ services:
     networks:
       - backend-networks
 
+
   postgres:
     image: postgres:latest
     container_name: my-postgres-container
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: didgksehd
-      POSTGRES_PASSWORD: za121548
-      POSTGRES_DB: duckful
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: didgksehd
+      POSTGRES_DB: deogjil
     networks:
       - backend-networks
+
 
   nestjs_api:
     build:

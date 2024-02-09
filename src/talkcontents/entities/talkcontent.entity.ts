@@ -34,6 +34,7 @@ export class Talkcontent extends CommonEntity {
   @OneToMany(
     () => CommentTalkContent,
     (commentTalkContent: CommentTalkContent) => commentTalkContent.talkContent,
+    { cascade: true },
   )
   public comment: CommentTalkContent[];
 
@@ -42,7 +43,7 @@ export class Talkcontent extends CommonEntity {
     (likeTalkContent: LikeTalkContent) => likeTalkContent.talkContent,
     { cascade: true },
   )
-  public like: LikeTalkContent;
+  public like: LikeTalkContent[];
 
   @Column({ default: 0 })
   public commentCount: number;

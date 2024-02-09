@@ -97,7 +97,7 @@ export class CommentContentService {
   async commentDelete(id: string, user: User) {
     const comment = await this.commentContentRepository.findOne({
       where: { id },
-      relations: ['writer'],
+      relations: ['writer', 'content'],
     });
     if (!comment) {
       throw new NotFoundException('Not Comment');

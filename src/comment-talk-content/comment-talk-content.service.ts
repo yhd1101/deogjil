@@ -37,7 +37,7 @@ export class CommentTalkContentService {
       .createQueryBuilder()
       .update(Talkcontent)
       .set({ commentCount: () => '"commentCount" + 1' }) // 댓글 개수 증가
-      .where('id = :talkContentId', { contentId })
+      .where('id = :contentId', { contentId })
       .execute();
     return newComment;
   }
@@ -73,7 +73,7 @@ export class CommentTalkContentService {
   async commentDelete(id: string, user: User) {
     const comment = await this.commentTalkContentRepository.findOne({
       where: { id },
-      relations: ['writer'],
+      relations: ['writer', 'talkContent'],
     });
     if (!comment) {
       throw new NotFoundException('Not Comment');
@@ -84,7 +84,14 @@ export class CommentTalkContentService {
         ' you do not have permission to delete this comment',
       );
     }
+    const contentId = comment.talkContent.id;
     await this.commentTalkContentRepository.delete(id);
+    await this.talkcontentRepository
+      .createQueryBuilder()
+      .update(Talkcontent)
+      .set({ commentCount: () => '"commentCount" - 1' }) // 댓글 개수 증가
+      .where('id = :contentId', { contentId })
+      .execute();
     return 'deleted';
   }
 }

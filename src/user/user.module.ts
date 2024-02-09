@@ -3,7 +3,6 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { LocalFilesModule } from '../local-files/local-files.module';
 import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
@@ -12,7 +11,6 @@ import { MulterModule } from '@nestjs/platform-express';
       dest: './upload',
     }),
     TypeOrmModule.forFeature([User]),
-    LocalFilesModule,
   ],
   controllers: [UserController],
   providers: [UserService],

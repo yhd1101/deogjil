@@ -12,37 +12,39 @@ import {
 import { LikeTalkContentService } from './like-talk-content.service';
 import { CreateLikeTalkContentDto } from './dto/create-like-talk-content.dto';
 import { UpdateLikeTalkContentDto } from './dto/update-like-talk-content.dto';
-import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateLikeDto } from '../likes/dto/create-like.dto';
 import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 
-@Controller('like-talk-content')
+@ApiTags('likeTalkContent')
+@Controller('liketalkcontent')
 export class LikeTalkContentController {
   constructor(
     private readonly likeTalkContentService: LikeTalkContentService,
   ) {}
 
   @Post('create')
-  @ApiBody({ type: CreateLikeDto })
+  @ApiBody({ type: CreateLikeTalkContentDto })
   @ApiOperation({
     summary: '덕질토크 좋아요기능',
-    description: '좋아요기능',
+    description: '덕질토크좋아요기능',
   })
   @ApiOperation({
-    description: 'duck talk like',
+    description: 'Like',
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
-  async like(
+  async likeContent(
     @Req() req: RequestWithUserInterface,
     @Body() createLikeTalkContentDto: CreateLikeTalkContentDto,
   ) {
-    const like = await this.likeTalkContentService.createLike(
+    console.log(createLikeTalkContentDto);
+    const likeCount = await this.likeTalkContentService.createLike(
       req.user,
       createLikeTalkContentDto,
     );
-    return like;
+    return likeCount;
   }
 
   @Delete(':id')

@@ -55,24 +55,27 @@ export class User extends CommonEntity {
   @Exclude()
   public currentHashedRefreshToken?: string;
 
-  @OneToMany(() => Like, (like: Like) => like.user)
+  @OneToMany(() => Like, (like: Like) => like.user, { cascade: true })
   public like: Like[];
 
   @OneToMany(
     () => LikeTalkContent,
     (likeTalkContent: LikeTalkContent) => likeTalkContent.user,
+    { cascade: true },
   )
   public likeTalkContent: LikeTalkContent[];
 
   @OneToMany(
     () => CommentContent,
     (commentContent: CommentContent) => commentContent.writer,
+    { cascade: true },
   )
   public commetComment: CommentContent[];
 
   @OneToMany(
     () => CommentTalkContent,
     (commentTalkContent: CommentTalkContent) => commentTalkContent.writer,
+    { cascade: true },
   )
   public commentTalkComment: CommentTalkContent[];
 

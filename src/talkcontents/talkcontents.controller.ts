@@ -99,16 +99,19 @@ export class TalkcontentsController {
   @Patch(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('talkContents')))
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateTalkContentById(
     @Body() updateTalkcontentDto: UpdateTalkcontentDto,
     @Param('id') id: string,
     @Req() req: RequestWithUserInterface,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     return await this.talkcontentsService.talkContentUpdateById(
       id,
       updateTalkcontentDto,
       req.user,
+      files,
     );
   }
 

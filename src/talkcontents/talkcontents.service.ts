@@ -124,6 +124,7 @@ export class TalkcontentsService {
     id: string,
     updateTalkcontentDto: UpdateTalkcontentDto,
     user: User,
+    files: Express.Multer.File[],
   ) {
     const content = await this.talkcontentRepository.findOne({
       where: { id },
@@ -142,9 +143,38 @@ export class TalkcontentsService {
         'You do not have permission to update this content',
       );
     }
+    if (files && files.length > 0) {
+      await Promise.all(
+        content.img.map(async (imageUrl) => {
+          try {
+            const key = this.extractS3KeyFromUrl(imageUrl);
+            await this.deleteS3Object(key);
+          } catch (error) {
+            console.error('Error deleting S3 object:', error);
+          }
+        }),
+      );
 
-    await this.talkcontentRepository.update(id, updateTalkcontentDto);
-    return 'Updated talkContent';
+      // files가 제공된 경우에만 새로운 이미지 업로드
+      const uploadedImageUrls = await Promise.all(
+        files.map(async (file) => {
+          const { key, contentType } = await this.uploadFileToS3(
+            'talkContents',
+            file,
+          );
+          return this.getAwsS3FileUrl(key);
+        }),
+      );
+
+      // 이미지 URL로 업데이트
+      await this.talkcontentRepository.update(id, {
+        ...updateTalkcontentDto,
+        img: uploadedImageUrls,
+      });
+    } else {
+      // files가 없는 경우에는 이미지 업로드 및 삭제 로직 생략
+      await this.talkcontentRepository.update(id, updateTalkcontentDto);
+    }
   }
 
   async tallContentDeleteById(id: string, user: User) {
@@ -161,6 +191,18 @@ export class TalkcontentsService {
         'You do not have permission to update this content',
       );
     }
+
+    await Promise.all(
+      content.img.map(async (imageUrl) => {
+        try {
+          const key = this.extractS3KeyFromUrl(imageUrl);
+          console.log(key);
+          await this.deleteS3Object(key);
+        } catch (error) {
+          console.error('Error deleting S3 object:', error);
+        }
+      }),
+    );
     await this.talkcontentRepository.delete(id);
     return 'deleted';
   }
@@ -193,6 +235,16 @@ export class TalkcontentsService {
     }
   }
 
+  public getAwsS3FileUrl(objectKey: string) {
+    return `https://${this.S3_BUCKET_NAME}.s3.amazonaws.com/${objectKey}`;
+  }
+
+  private extractS3KeyFromUrl(url: string): string {
+    const urlParts = url.split('/');
+    const contentIndex = urlParts.indexOf('talkContents');
+    return urlParts.slice(contentIndex).join('/');
+  }
+
   async deleteS3Object(
     key: string,
     callback?: (err: AWS.AWSError, data: AWS.S3.DeleteObjectOutput) => void,
@@ -210,9 +262,5 @@ export class TalkcontentsService {
     } catch (error) {
       throw new BadRequestException(`Failed to delete file : ${error}`);
     }
-  }
-
-  public getAwsS3FileUrl(objectKey: string) {
-    return `https://${this.S3_BUCKET_NAME}.s3.amazonaws.com/${objectKey}`;
   }
 }

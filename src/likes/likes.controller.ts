@@ -45,6 +45,7 @@ export class LikesController {
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: '좋아요 취소', description: ' 좋아요취소' })
   async likeDelete(@Param('id') id: string) {
+    console.log('ddd', id);
     await this.likesService.deleteLike(id);
   }
 }

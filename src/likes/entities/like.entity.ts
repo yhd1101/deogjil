@@ -6,7 +6,9 @@ import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 
 @Entity()
 export class Like extends CommonEntity {
-  @ManyToOne(() => User, (user: User) => user.like)
+  @ManyToOne(() => User, (user: User) => user.like, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   public user: User;
 

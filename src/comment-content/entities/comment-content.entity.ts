@@ -5,7 +5,9 @@ import { Content } from '../../contents/entities/content.entity';
 
 @Entity()
 export class CommentContent extends CommonEntity {
-  @ManyToOne(() => User, (user: User) => user.commetComment)
+  @ManyToOne(() => User, (user: User) => user.commetComment, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   public writer: User;
 

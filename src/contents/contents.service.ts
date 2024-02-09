@@ -202,58 +202,6 @@ export class ContentsService {
     return { content };
   }
 
-  // async contentUpdateById(
-  //   id: string,
-  //   updateContentDto: UpdateContentDto,
-  //   user: User,
-  //   files: Express.Multer.File[],
-  // ) {
-  //   const content = await this.contentRepository.findOne({
-  //     where: { id },
-  //     relations: ['writer'],
-  //   });
-  //
-  //   if (!content) {
-  //     // 글이 없는 경우 NotFoundException을 던짐
-  //     throw new NotFoundException('Content not found');
-  //   }
-  //
-  //   // 사용자가 글의 작성자인지 확인
-  //   if (content.writer.id !== user.id) {
-  //     // 권한이 없는 경우 ForbiddenException을 던짐
-  //     throw new ForbiddenException(
-  //       'You do not have permission to update this content',
-  //     );
-  //   }
-  //
-  //   await this.deleteS3Objects(content.img);
-  //
-  //   // // 업로드된 이미지 파일을 S3에서 삭제
-  //   // await Promise.all(
-  //   //   content.img.map(async (imageUrl) => {
-  //   //     const key = this.extractS3KeyFromUrl(imageUrl);
-  //   //     console.log(key);
-  //   //     await this.deleteS3Object(key);
-  //   //   }),
-  //   // );
-  //
-  //   // 새로운 이미지 파일을 업로드하고 URL 얻기
-  //   const uploadedImageUrls = await Promise.all(
-  //     files.map(async (file) => {
-  //       const { key, contentType } = await this.uploadFileToS3('content', file);
-  //       return this.getAwsS3FileUrl(key);
-  //     }),
-  //   );
-  //
-  //   // 글을 업데이트
-  //   await this.contentRepository.update(id, {
-  //     ...updateContentDto,
-  //     img: uploadedImageUrls, // 새로운 이미지 URL로 업데이트
-  //   });
-  //
-  //   return 'Updated content';
-  // }
-
   async contentUpdateById(
     id: string,
     updateContentDto: UpdateContentDto,
@@ -276,31 +224,39 @@ export class ContentsService {
         );
       }
 
-      // 업로드된 이미지 파일을 S3에서 삭제
-      await Promise.all(
-        content.img.map(async (imageUrl) => {
-          const key = this.extractS3KeyFromUrl(imageUrl);
-          console.log(key);
-          await this.deleteS3Object(key);
-        }),
-      );
+      // files가 제공된 경우에만 이미지 삭제 및 업로드 수행
+      if (files && files.length > 0) {
+        await Promise.all(
+          content.img.map(async (imageUrl) => {
+            try {
+              const key = this.extractS3KeyFromUrl(imageUrl);
+              await this.deleteS3Object(key);
+            } catch (error) {
+              console.error('Error deleting S3 object:', error);
+            }
+          }),
+        );
 
-      // 새로운 이미지 파일을 업로드하고 URL 얻기
-      const uploadedImageUrls = await Promise.all(
-        files.map(async (file) => {
-          const { key, contentType } = await this.uploadFileToS3(
-            'content',
-            file,
-          );
-          return this.getAwsS3FileUrl(key);
-        }),
-      );
+        // files가 제공된 경우에만 새로운 이미지 업로드
+        const uploadedImageUrls = await Promise.all(
+          files.map(async (file) => {
+            const { key, contentType } = await this.uploadFileToS3(
+              'content',
+              file,
+            );
+            return this.getAwsS3FileUrl(key);
+          }),
+        );
 
-      // 글을 업데이트
-      await this.contentRepository.update(id, {
-        ...updateContentDto,
-        img: uploadedImageUrls, // 새로운 이미지 URL로 업데이트
-      });
+        // 이미지 URL로 업데이트
+        await this.contentRepository.update(id, {
+          ...updateContentDto,
+          img: uploadedImageUrls,
+        });
+      } else {
+        // files가 없는 경우에는 이미지 업로드 및 삭제 로직 생략
+        await this.contentRepository.update(id, updateContentDto);
+      }
 
       return 'Updated content';
     } catch (error) {
@@ -311,7 +267,8 @@ export class ContentsService {
 
   private extractS3KeyFromUrl(url: string): string {
     const urlParts = url.split('/');
-    return urlParts[urlParts.length - 1];
+    const contentIndex = urlParts.indexOf('content');
+    return urlParts.slice(contentIndex).join('/');
   }
 
   async contentDeleteById(id: string, user: User) {
@@ -330,22 +287,18 @@ export class ContentsService {
           'You do not have permission to delete this content',
         );
       }
+      await Promise.all(
+        content.img.map(async (imageUrl) => {
+          try {
+            const key = this.extractS3KeyFromUrl(imageUrl);
+            console.log(key);
+            await this.deleteS3Object(key);
+          } catch (error) {
+            console.error('Error deleting S3 object:', error);
+          }
+        }),
+      );
 
-      // 업로드된 이미지 파일을 S3에서 삭제
-      for (const imageUrl of content.img) {
-        try {
-          const key = this.extractS3KeyFromUrl(imageUrl);
-          await this.awsS3
-            .deleteObject({
-              Bucket: this.S3_BUCKET_NAME,
-              Key: key,
-            })
-            .promise();
-        } catch (error) {
-          console.error('Error deleting S3 object:', error);
-          // 이미지 삭제에 실패하더라도 계속 진행
-        }
-      }
       await this.contentRepository.delete(id);
       return 'deleted';
     } catch (error) {
