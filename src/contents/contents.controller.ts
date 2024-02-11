@@ -70,13 +70,11 @@ export class ContentsController {
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
     @Query('sortType') sortType?: string,
-    @Query('tag') tag?: string,
   ): Promise<PageDto<Content>> {
     return await this.contentsService.contentGetAll(
       pageOptionsDto,
       searchQuery,
       sortType,
-      tag,
     );
   }
 

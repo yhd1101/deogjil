@@ -13,19 +13,12 @@ export class SearchService {
   ) {}
 
   async search(
-    query: string,
-    sortType: string,
-    tag: string,
     pageOptionsDto: PageOptionsDto,
+    searchQuery?: string,
   ): Promise<any> {
     const [contentsResult, talkContentsResults] = await Promise.all([
-      this.contentsService.contentGetAll(pageOptionsDto, query, sortType, tag),
-      this.talkcontentsService.talkContentGetAll(
-        pageOptionsDto,
-        query,
-        sortType,
-        tag,
-      ),
+      this.contentsService.contentGetAll(pageOptionsDto, searchQuery),
+      this.talkcontentsService.talkContentGetAll(pageOptionsDto, searchQuery),
     ]);
 
     const combinedResult = {

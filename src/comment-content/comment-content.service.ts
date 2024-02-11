@@ -20,15 +20,6 @@ export class CommentContentService {
     private readonly contentRepository: Repository<Content>,
   ) {}
 
-  async commentGetAll() {
-    const result = await this.commentContentRepository.find({
-      relations: ['content'],
-    });
-    const contentIds = result.map((comment) => comment.content.id);
-
-    return contentIds;
-  }
-
   async commentCreate(
     createCommentContentDto: CreateCommentContentDto,
     user: User,

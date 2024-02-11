@@ -152,23 +152,22 @@ export class ContentsService {
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
     sortType?: string,
-    tag?: string,
   ): Promise<PageDto<Content>> {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
 
     if (searchQuery) {
+      console.log(searchQuery);
       queryBuilder.where(
-        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery',
+        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery OR :searchQuery = ANY(contents.tag)',
         { searchQuery: `%${searchQuery}%` },
       );
+      queryBuilder.andWhere(':searchQuery = ANY(contents.tag)', {
+        searchQuery,
+      });
     }
 
-    if (tag) {
-      // tag가 주어진 경우 해당하는 태그가 포함된 컨텐츠를 검색
-      queryBuilder.andWhere(':tag = ANY(contents.tag)', { tag });
-    }
     switch (sortType) {
       case 'like':
         queryBuilder.addOrderBy('contents.likeCount', 'DESC');

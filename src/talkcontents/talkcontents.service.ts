@@ -69,7 +69,6 @@ export class TalkcontentsService {
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
     sortType?: string,
-    tag?: string,
   ): Promise<PageDto<Talkcontent>> {
     const queryBuilder =
       await this.talkcontentRepository.createQueryBuilder('talkContents');
@@ -77,14 +76,14 @@ export class TalkcontentsService {
 
     if (searchQuery) {
       queryBuilder.where(
-        'talkContents.title LIKE :searchQuery OR talkContents.desc LIKE :searchQuery',
+        'talkContents.title LIKE :searchQuery OR talkContents.desc LIKE :searchQuery OR :searchQuery = ANY(talkContents.tag)',
         { searchQuery: `%${searchQuery}%` },
       );
+      queryBuilder.andWhere(':searchQuery = ANY(talkContents.tag)', {
+        searchQuery,
+      });
     }
-    if (tag) {
-      // tag가 주어진 경우 해당하는 태그가 포함된 컨텐츠를 검색
-      queryBuilder.andWhere(':tag = ANY(talkContents.tag)', { tag });
-    }
+
     switch (sortType) {
       case 'like':
         queryBuilder.addOrderBy('talkContents.likeCount', 'DESC');

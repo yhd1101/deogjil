@@ -20,17 +20,10 @@ export class SearchController {
 
   @Get()
   async search(
-    @Query('query') query: string,
-    @Query('sortType') sortType: string,
-    @Query('tag') tag: string,
-    @Query() pageOptionsDto: PageOptionsDto,
+    @Query('searchQuery') searchQuery?: string,
+    @Query() pageOptionsDto?: PageOptionsDto,
   ): Promise<PageDto<any>> {
-    const result = await this.searchService.search(
-      query,
-      sortType,
-      tag,
-      pageOptionsDto,
-    );
+    const result = await this.searchService.search(pageOptionsDto, searchQuery);
     return result;
   }
 }

@@ -72,13 +72,11 @@ export class TalkcontentsController {
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
     @Query('sortType') sortType?: string,
-    @Query('tag') tag?: string,
   ): Promise<PageDto<Talkcontent>> {
     return await this.talkcontentsService.talkContentGetAll(
       pageOptionsDto,
       searchQuery,
       sortType,
-      tag,
     );
   }
 
