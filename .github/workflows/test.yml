@@ -1,0 +1,36 @@
+name: Build and Run
+
+on: pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    container:
+      image: node:14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build NestJS project
+        run: npm run build
+
+  deploy:
+    runs-on: ubuntu-20.04
+    container:
+      image: docker:latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t my-nestjs-app .
+
+      - name: Copy .env file
+        run: cp .env my-nestjs-app/.env
+
+      - name: Run Docker containers
+        run: docker compose up -d
