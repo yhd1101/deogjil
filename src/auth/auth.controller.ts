@@ -14,6 +14,8 @@ import {
   Query,
   BadRequestException,
   UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -35,6 +37,9 @@ import { User } from '../user/entities/user.entity';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from '../common/utils/multer.options';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -80,6 +85,30 @@ export class AuthController {
     const data = await this.authService.profile(user.id);
     user.password = undefined;
     return { data };
+  }
+  @Patch()
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
+  @UseInterceptors(FileInterceptor('files', multerOptions('user')))
+  @ApiOperation({ summary: '유저 업데이트', description: '유저정보 업데이트' })
+  async updateUser(
+    @Req() req: RequestWithUserInterface,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const { user } = req;
+    return await this.authService.updateProfile(user.id, updateUserDto, file);
+  }
+  @Get('check')
+  @ApiOperation({
+    summary: '닉네임 중복체크',
+    description: '닉네임 중복체크 true면 중복 ',
+  })
+  async checkNickname(
+    @Query('nickname') nickname: string,
+  ): Promise<{ isDuplicate: boolean }> {
+    const isDuplicate = await this.userService.checkNicknameDuplicate(nickname);
+    return { isDuplicate };
   }
 
   @Delete()

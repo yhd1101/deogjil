@@ -96,14 +96,6 @@ export class ContentsService {
       throw new BadRequestException(`File upload failed : ${error}`);
     }
   }
-  private async deleteS3Objects(keys: string[]) {
-    await Promise.all(
-      keys.map(async (key) => {
-        await this.deleteS3Object(key);
-      }),
-    );
-  }
-
   async deleteS3Object(
     key: string,
     callback?: (err: AWS.AWSError, data: AWS.S3.DeleteObjectOutput) => void,

@@ -49,4 +49,12 @@ export class CreateUserDto {
   })
   @IsOptional()
   profileImg?: string;
+
+  @ApiProperty({
+    description: 'nickname',
+    example: null,
+    nullable: true,
+  })
+  @IsOptional()
+  nickname?: string;
 }

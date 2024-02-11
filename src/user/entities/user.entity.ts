@@ -79,6 +79,9 @@ export class User extends CommonEntity {
   )
   public commentTalkComment: CommentTalkContent[];
 
+  @Column({ nullable: true })
+  public nickname?: string;
+
   @BeforeInsert()
   async beforeSaveFunction(): Promise<void> {
     try {

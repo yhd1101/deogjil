@@ -10,10 +10,8 @@ import {
   Req,
   Query,
   NotFoundException,
-  Put,
   UseInterceptors,
   UploadedFiles,
-  BadRequestException,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';

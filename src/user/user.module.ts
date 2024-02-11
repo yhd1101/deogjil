@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { MulterModule } from '@nestjs/platform-express';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -11,9 +12,10 @@ import { MulterModule } from '@nestjs/platform-express';
       dest: './upload',
     }),
     TypeOrmModule.forFeature([User]),
+    ConfigModule.forRoot(),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, ConfigService],
   exports: [UserService],
 })
 export class UserModule {}

@@ -17,6 +17,7 @@ import { User } from '../user/entities/user.entity';
 import { KakaoAuthStrategy } from './strategies/kakao-auth.strategy';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -40,6 +41,15 @@ export class AuthService {
     const userInfo = await this.userService.getUserInfo(id);
 
     return userInfo;
+  }
+
+  async updateProfile(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    file: Express.Multer.File,
+  ) {
+    const user = await this.userService.updateUser(id, updateUserDto, file);
+    return user;
   }
   async delete(id: string) {
     const userInfo = await this.userService.deleteByUser(id);
