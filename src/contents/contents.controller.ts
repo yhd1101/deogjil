@@ -19,7 +19,9 @@ import { UpdateContentDto } from './dto/update-content.dto';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -64,6 +66,8 @@ export class ContentsController {
 
   @Get()
   @ApiOperation({ summary: '글전체목록', description: '전체 글 조회' })
+  @ApiQuery({ name: 'search', required: false, description: '검색 유형' })
+  @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
   async getAllContent(
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,

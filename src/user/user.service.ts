@@ -32,6 +32,12 @@ export class UserService {
   }
 
   async CreateUser(createUserDto: CreateUserDto) {
+    const user = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+    if (user) {
+      throw new BadRequestException('user email exits');
+    }
     const newSignup = await this.userRepository.create(createUserDto);
     await this.userRepository.save(newSignup);
     return newSignup;

@@ -90,7 +90,10 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @UseInterceptors(FileInterceptor('files', multerOptions('user')))
-  @ApiOperation({ summary: '유저 업데이트', description: '유저정보 업데이트' })
+  @ApiOperation({
+    summary: '유저 업데이트',
+    description: '유저정보 업데이트 닉네임 10자이내',
+  })
   async updateUser(
     @Req() req: RequestWithUserInterface,
     @Body() updateUserDto: UpdateUserDto,

@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   Matches,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 import { Provider } from '../entities/provider.enum';
@@ -20,7 +21,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'email',
-    default: 'email@gmail.com',
+    default: 'duckful@gmail.com',
   })
   @IsEmail()
   email: string;
@@ -37,7 +38,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'provider',
-    default: 'kakao',
+    default: 'local',
   })
   @IsString()
   @IsOptional()
@@ -56,5 +57,6 @@ export class CreateUserDto {
     nullable: true,
   })
   @IsOptional()
+  @MaxLength(10)
   nickname?: string;
 }
