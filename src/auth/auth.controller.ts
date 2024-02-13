@@ -138,6 +138,7 @@ export class AuthController {
 
   //refreshtoken api
   @UseGuards(JwtRefreshAuthGuard)
+  @ApiBearerAuth('access-token')
   @Get('refresh')
   async refreshToken(@Req() req: RequestWithUserInterface) {
     const accessTokenCookie = await this.authService.generateAccessToken(
@@ -149,6 +150,7 @@ export class AuthController {
 
   //로그아웃
   @UseGuards(JwtAccessAuthGuard)
+  @ApiBearerAuth('access-token')
   @Post('logout')
   @HttpCode(200)
   async logOut(@Req() req: RequestWithUserInterface) {

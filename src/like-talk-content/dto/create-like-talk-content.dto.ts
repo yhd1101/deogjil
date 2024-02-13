@@ -5,8 +5,7 @@ import { Talkcontent } from '../../talkcontents/entities/talkcontent.entity';
 export class CreateLikeTalkContentDto {
   @ApiProperty({
     description: 'insert contentId',
-    example: { id: 'id' }, // 예제 값 설정
+    default: 'talkContentId',
   })
-  @IsOptional()
   talkcontent: Talkcontent;
 }

@@ -97,6 +97,9 @@ export class User extends CommonEntity {
           d: 'mm',
           protocol: 'https',
         });
+        if (this.name) {
+          this.nickname = this.name;
+        }
       }
     } catch (err) {
       console.log(err);

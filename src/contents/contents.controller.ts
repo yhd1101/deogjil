@@ -19,6 +19,7 @@ import { UpdateContentDto } from './dto/update-content.dto';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOperation,
   ApiQuery,
@@ -39,6 +40,7 @@ export class ContentsController {
   constructor(private readonly contentsService: ContentsService) {}
 
   @Post('/create')
+  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateContentDto })
   @ApiOperation({
     summary: '덕풀 글쓰기',
@@ -68,15 +70,18 @@ export class ContentsController {
   @ApiOperation({ summary: '글전체목록', description: '전체 글 조회' })
   @ApiQuery({ name: 'search', required: false, description: '검색 유형' })
   @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
+  @ApiQuery({ name: 'tag', required: false, description: '태그' })
   async getAllContent(
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
     @Query('sortType') sortType?: string,
+    @Query('tag') tag?: string,
   ): Promise<PageDto<Content>> {
     return await this.contentsService.contentGetAll(
       pageOptionsDto,
       searchQuery,
       sortType,
+      tag,
     );
   }
 

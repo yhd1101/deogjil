@@ -15,6 +15,7 @@ export class SearchService {
   async search(
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
+    // tag?: string,
   ): Promise<any> {
     const [contentsResult, talkContentsResults] = await Promise.all([
       this.contentsService.contentGetAll(pageOptionsDto, searchQuery),

@@ -37,7 +37,7 @@ export class LikeTalkContentService {
       .createQueryBuilder('likeTalkContent')
       .where('likeTalkContent.user = :userId', { userId: user.id })
       .andWhere('likeTalkContent.talkContent = :talkContentId', {
-        talkContentId: newLike.talkContent.id,
+        talkContentId: newLike.talkContent,
       })
       .getCount();
 
@@ -47,7 +47,7 @@ export class LikeTalkContentService {
       throw new ConflictException('already liked');
     }
 
-    const contentId = newLike.talkContent.id;
+    const contentId = newLike.talkContent;
     console.log(contentId);
     // //
     // const id = createLikeTalkContentDto.talkcontent.id;

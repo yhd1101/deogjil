@@ -21,6 +21,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -68,15 +69,20 @@ export class TalkcontentsController {
     summary: '덕질토크 전체조회',
     description: '덕질토크 전체조회해줌',
   })
+  @ApiQuery({ name: 'search', required: false, description: '검색 유형' })
+  @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
+  @ApiQuery({ name: 'tag', required: false, description: '태그' })
   async getAllTalkContents(
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
     @Query('sortType') sortType?: string,
+    @Query('tag') tag?: string,
   ): Promise<PageDto<Talkcontent>> {
     return await this.talkcontentsService.talkContentGetAll(
       pageOptionsDto,
       searchQuery,
       sortType,
+      tag,
     );
   }
 

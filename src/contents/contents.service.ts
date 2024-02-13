@@ -144,10 +144,16 @@ export class ContentsService {
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
     sortType?: string,
+    tag?: string,
   ): Promise<PageDto<Content>> {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
+    if (tag) {
+      queryBuilder.andWhere(':paramTag = ANY(contents.tag)', {
+        paramTag: tag,
+      });
+    }
 
     if (searchQuery) {
       console.log(searchQuery);
@@ -187,6 +193,7 @@ export class ContentsService {
       .createQueryBuilder('content')
       .leftJoinAndSelect('content.writer', 'writer')
       .leftJoinAndSelect('content.comment', 'comment')
+      .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
       .where('content.id= :id', { id })
       .getOne();
 

@@ -69,10 +69,16 @@ export class TalkcontentsService {
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
     sortType?: string,
+    tag?: string,
   ): Promise<PageDto<Talkcontent>> {
     const queryBuilder =
       await this.talkcontentRepository.createQueryBuilder('talkContents');
     queryBuilder.leftJoinAndSelect('talkContents.writer', 'writer');
+    if (tag) {
+      queryBuilder.andWhere(':paramTag = ANY(talkContents.tag)', {
+        paramTag: tag,
+      });
+    }
 
     if (searchQuery) {
       queryBuilder.where(

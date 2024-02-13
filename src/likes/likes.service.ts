@@ -30,13 +30,13 @@ export class LikesService {
     const likeCount = await this.likeRepository
       .createQueryBuilder('like')
       .where('like.user = :userId', { userId: user.id })
-      .andWhere('like.content = :contentId', { contentId: newLike.content.id })
+      .andWhere('like.content = :contentId', { contentId: newLike.content })
       .getCount();
 
     if (likeCount > 0) {
       throw new ConflictException('already liked');
     }
-    const contentId = createLikeDto.content.id;
+    const contentId = createLikeDto.content;
 
     await this.likeRepository.save(newLike);
 
