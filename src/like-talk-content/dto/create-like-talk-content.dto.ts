@@ -7,5 +7,5 @@ export class CreateLikeTalkContentDto {
     description: 'insert contentId',
     default: 'talkContentId',
   })
-  talkcontent: Talkcontent;
+  content: Talkcontent;
 }

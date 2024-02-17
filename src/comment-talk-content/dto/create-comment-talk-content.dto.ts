@@ -17,5 +17,5 @@ export class CreateCommentTalkContentDto {
   })
   @IsString()
   @IsNotEmpty()
-  talkContent: Talkcontent;
+  content: Talkcontent;
 }

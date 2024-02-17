@@ -67,7 +67,11 @@ export class ContentsController {
   }
 
   @Get()
-  @ApiOperation({ summary: '글전체목록', description: '전체 글 조회' })
+  @ApiOperation({
+    summary: '글전체목록',
+    description:
+      '전체 글 조회 sortType= like(좋아요 많은순), sortType=commentcount (댓글많은순)',
+  })
   @ApiQuery({ name: 'search', required: false, description: '검색 유형' })
   @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
   @ApiQuery({ name: 'tag', required: false, description: '태그' })

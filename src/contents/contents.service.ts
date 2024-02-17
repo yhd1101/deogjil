@@ -150,8 +150,8 @@ export class ContentsService {
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
     if (tag) {
-      queryBuilder.andWhere(':paramTag = ANY(contents.tag)', {
-        paramTag: tag,
+      queryBuilder.andWhere(':tag = ANY(contents.tag)', {
+        tag,
       });
     }
 
@@ -195,6 +195,7 @@ export class ContentsService {
       .leftJoinAndSelect('content.comment', 'comment')
       .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
       .where('content.id= :id', { id })
+      .orderBy('comment.createdAt', 'DESC')
       .getOne();
 
     return { content };
@@ -207,6 +208,7 @@ export class ContentsService {
     files: Express.Multer.File[],
   ) {
     try {
+      const currentDateTime = new Date();
       const content = await this.contentRepository.findOne({
         where: { id },
         relations: ['writer'],
@@ -245,16 +247,30 @@ export class ContentsService {
             return this.getAwsS3FileUrl(key);
           }),
         );
-
         // 이미지 URL로 업데이트
-        await this.contentRepository.update(id, {
-          ...updateContentDto,
-          img: uploadedImageUrls,
-        });
+        await this.contentRepository.update(
+          { id },
+          {
+            ...updateContentDto,
+            img: uploadedImageUrls,
+            updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+          },
+        );
       } else {
         // files가 없는 경우에는 이미지 업로드 및 삭제 로직 생략
-        await this.contentRepository.update(id, updateContentDto);
+        // 이미지 URL로 업데이트
+        await this.contentRepository.update(
+          { id },
+          {
+            ...updateContentDto,
+            updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+          },
+        );
       }
+
+      // updatedAt 갱신
+
+      // await this.contentRepository.save(content);
 
       return 'Updated content';
     } catch (error) {

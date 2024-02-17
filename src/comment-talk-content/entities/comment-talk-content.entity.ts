@@ -19,7 +19,7 @@ export class CommentTalkContent extends CommonEntity {
     },
   )
   @JoinColumn()
-  public talkContent: Talkcontent;
+  public content: Talkcontent;
 
   @Column()
   public desc: string;

@@ -29,7 +29,7 @@ export class CommentTalkContentService {
       ...createCommentTalkContentDto,
       writer: user,
     });
-    const contentId = createCommentTalkContentDto.talkContent;
+    const contentId = createCommentTalkContentDto.content;
 
     await this.commentTalkContentRepository.save(newComment);
 
@@ -47,6 +47,7 @@ export class CommentTalkContentService {
     updateCommentTalkContentDto: UpdateCommentTalkContentDto,
     user: User,
   ) {
+    const currentDateTime = new Date();
     const comment = await this.commentTalkContentRepository.findOne({
       where: { id },
       relations: ['writer'],
@@ -63,8 +64,11 @@ export class CommentTalkContentService {
     }
 
     await this.commentTalkContentRepository.update(
-      id,
-      updateCommentTalkContentDto,
+      { id },
+      {
+        ...updateCommentTalkContentDto,
+        updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+      },
     );
 
     return 'updated comment';
@@ -84,7 +88,7 @@ export class CommentTalkContentService {
         ' you do not have permission to delete this comment',
       );
     }
-    const contentId = comment.talkContent.id;
+    const contentId = comment.content.id;
     await this.commentTalkContentRepository.delete(id);
     await this.talkcontentRepository
       .createQueryBuilder()

@@ -17,5 +17,5 @@ export class LikeTalkContent extends CommonEntity {
     { onDelete: 'CASCADE' },
   )
   @JoinColumn()
-  public talkContent: Talkcontent;
+  public content: Talkcontent;
 }

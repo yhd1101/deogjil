@@ -66,6 +66,7 @@ export class CommentContentService {
     updateCommentContentDto: UpdateCommentContentDto,
     user: User,
   ) {
+    const currentDateTime = new Date();
     const comment = await this.commentContentRepository.findOne({
       where: { id },
       relations: ['writer'],
@@ -80,7 +81,13 @@ export class CommentContentService {
       );
     }
 
-    await this.commentContentRepository.update(id, updateCommentContentDto);
+    await this.commentContentRepository.update(
+      { id },
+      {
+        ...updateCommentContentDto,
+        updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+      },
+    );
 
     return 'updated comment';
   }

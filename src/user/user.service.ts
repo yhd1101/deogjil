@@ -74,6 +74,7 @@ export class UserService {
     updateUserDto: UpdateUserDto,
     file: Express.Multer.File,
   ) {
+    const currentDateTime = new Date();
     const user = await this.userRepository.findOne({
       where: { id },
     });
@@ -97,12 +98,22 @@ export class UserService {
       // 파일 업로드 처리
       const { key, contentType } = await this.uploadFileToS3('user', file);
       const newImageUrl = this.getAwsS3FileUrl(key);
-      await this.userRepository.update(id, {
-        ...updateUserDto,
-        profileImg: newImageUrl,
-      });
+      await this.userRepository.update(
+        { id },
+        {
+          ...updateUserDto,
+          profileImg: newImageUrl,
+          updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+        },
+      );
     } else {
-      await this.userRepository.update(id, updateUserDto);
+      await this.userRepository.update(
+        { id },
+        {
+          ...updateUserDto,
+          updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+        },
+      );
     }
     return 'updated user';
   }

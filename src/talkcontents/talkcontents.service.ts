@@ -75,8 +75,8 @@ export class TalkcontentsService {
       await this.talkcontentRepository.createQueryBuilder('talkContents');
     queryBuilder.leftJoinAndSelect('talkContents.writer', 'writer');
     if (tag) {
-      queryBuilder.andWhere(':paramTag = ANY(talkContents.tag)', {
-        paramTag: tag,
+      queryBuilder.andWhere(':tag = ANY(talkContents.tag)', {
+        tag,
       });
     }
 
@@ -131,6 +131,7 @@ export class TalkcontentsService {
     user: User,
     files: Express.Multer.File[],
   ) {
+    const currentDateTime = new Date();
     const content = await this.talkcontentRepository.findOne({
       where: { id },
       relations: ['writer'],
@@ -171,14 +172,23 @@ export class TalkcontentsService {
         }),
       );
 
-      // 이미지 URL로 업데이트
-      await this.talkcontentRepository.update(id, {
-        ...updateTalkcontentDto,
-        img: uploadedImageUrls,
-      });
+      await this.talkcontentRepository.update(
+        { id },
+        {
+          ...updateTalkcontentDto,
+          img: uploadedImageUrls,
+          updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+        },
+      );
     } else {
       // files가 없는 경우에는 이미지 업로드 및 삭제 로직 생략
-      await this.talkcontentRepository.update(id, updateTalkcontentDto);
+      await this.talkcontentRepository.update(
+        { id },
+        {
+          ...updateTalkcontentDto,
+          updatedAt: new Date(currentDateTime.getTime() + 9 * 60 * 60 * 1000),
+        },
+      );
     }
   }
 

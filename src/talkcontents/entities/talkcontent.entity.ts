@@ -33,14 +33,14 @@ export class Talkcontent extends CommonEntity {
 
   @OneToMany(
     () => CommentTalkContent,
-    (commentTalkContent: CommentTalkContent) => commentTalkContent.talkContent,
+    (commentTalkContent: CommentTalkContent) => commentTalkContent.content,
     { cascade: true },
   )
   public comment: CommentTalkContent[];
 
   @OneToMany(
     () => LikeTalkContent,
-    (likeTalkContent: LikeTalkContent) => likeTalkContent.talkContent,
+    (likeTalkContent: LikeTalkContent) => likeTalkContent.content,
     { cascade: true },
   )
   public like: LikeTalkContent[];

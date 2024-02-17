@@ -20,7 +20,6 @@ export class CreateContentDto {
     description: 'insert tag',
     default: ['Marble'],
   })
-  @IsArray()
   public tag?: string[];
 
   @ApiProperty({
