@@ -22,6 +22,7 @@ export class Talkcontent extends CommonEntity {
   @Column('text', {
     array: true,
     nullable: true,
+    default: [],
   })
   public tag?: string[];
 

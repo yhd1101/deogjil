@@ -29,6 +29,7 @@ export class Content extends CommonEntity {
   @Column('text', {
     array: true,
     nullable: true,
+    default: [],
   })
   public tag?: string[];
 

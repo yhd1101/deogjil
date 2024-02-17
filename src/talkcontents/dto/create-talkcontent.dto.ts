@@ -22,6 +22,5 @@ export class CreateTalkcontentDto {
     description: 'insert tag',
     default: ['Marble'],
   })
-  @IsArray()
   public tag?: string[];
 }
