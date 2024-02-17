@@ -106,7 +106,7 @@ export class ContentsController {
   @Patch(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
-  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('contents')))
+  @UseInterceptors(FilesInterceptor('files'))
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateContentById(
     @Body() updateContentDto: UpdateContentDto,

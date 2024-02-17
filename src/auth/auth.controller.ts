@@ -89,7 +89,7 @@ export class AuthController {
   @Patch()
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
-  @UseInterceptors(FileInterceptor('files', multerOptions('user')))
+  @UseInterceptors(FileInterceptor('files'))
   @ApiOperation({
     summary: '유저 업데이트',
     description: '유저정보 업데이트 닉네임 10자이내',

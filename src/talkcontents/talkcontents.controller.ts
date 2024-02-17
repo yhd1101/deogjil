@@ -103,7 +103,7 @@ export class TalkcontentsController {
   @Patch(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
-  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('talkContents')))
+  @UseInterceptors(FilesInterceptor('files'))
   @ApiOperation({ summary: '글 수정', description: '글을 수정해줌' })
   async updateTalkContentById(
     @Body() updateTalkcontentDto: UpdateTalkcontentDto,
