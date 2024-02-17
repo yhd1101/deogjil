@@ -43,10 +43,7 @@ export class ContentsService {
       // 이미지 업로드 및 URL 가져오기
       const uploadedImageUrls = await Promise.all(
         files.map(async (file) => {
-          const { key, contentType } = await this.uploadFileToS3(
-            'content',
-            file,
-          );
+          const { key } = await this.uploadFileToS3('content', file);
           return this.getAwsS3FileUrl(key);
         }),
       );

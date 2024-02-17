@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
+import * as multer from 'multer';
 @Module({
   imports: [
     MulterModule.register({
       dest: './upload',
+      storage: multer.memoryStorage(),
     }),
     TypeOrmModule.forFeature([User]),
     ConfigModule.forRoot(),

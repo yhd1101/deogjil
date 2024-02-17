@@ -50,7 +50,7 @@ export class TalkcontentsController {
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
-  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('talkContents')))
+  @UseInterceptors(FilesInterceptor('files'))
   async createContent(
     @Req() req: RequestWithUserInterface,
     @Body() createTalkcontentDto: CreateTalkcontentDto,

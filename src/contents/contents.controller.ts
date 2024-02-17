@@ -51,7 +51,7 @@ export class ContentsController {
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
-  @UseInterceptors(FilesInterceptor('files', 10, multerOptions('contents')))
+  @UseInterceptors(FilesInterceptor('files'))
   async createContent(
     @Req() req: RequestWithUserInterface,
     @Body() createContentDto: CreateContentDto,
