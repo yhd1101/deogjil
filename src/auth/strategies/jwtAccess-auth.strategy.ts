@@ -18,6 +18,7 @@ export class JwtAccessAuthStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: TokenPayloadInterface) {
+    console.log('Token Payload:', payload);
     return this.userService.getUserById(payload.userId);
   }
 }

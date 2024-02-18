@@ -23,6 +23,7 @@ export class SearchService {
         searchQuery,
         undefined,
         tag,
+        undefined,
       ),
       this.talkcontentsService.talkContentGetAll(
         pageOptionsDto,
@@ -34,7 +35,7 @@ export class SearchService {
 
     const combinedResult = {
       contents: contentsResult,
-      talContents: talkContentsResults,
+      talkContents: talkContentsResults,
       metadata: {
         totalResults: contentsResult.meta + talkContentsResults.meta,
       },

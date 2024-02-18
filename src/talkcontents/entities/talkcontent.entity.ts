@@ -51,4 +51,6 @@ export class Talkcontent extends CommonEntity {
 
   @Column({ default: 0 })
   public likeCount: number;
+  @Column({ default: false })
+  public isLiked: boolean;
 }

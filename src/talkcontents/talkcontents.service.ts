@@ -70,6 +70,7 @@ export class TalkcontentsService {
     searchQuery?: string,
     sortType?: string,
     tag?: string,
+    user?: { id: string },
   ): Promise<PageDto<Talkcontent>> {
     const queryBuilder =
       await this.talkcontentRepository.createQueryBuilder('talkContents');
@@ -106,11 +107,17 @@ export class TalkcontentsService {
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
       .getManyAndCount();
+
+    for (const content of contentWithCommentCount) {
+      content.isLiked = user
+        ? content.like.some((like) => like.user.id === user.id)
+        : false;
+    }
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto<Talkcontent>(contentWithCommentCount, pageMetaDto);
   }
 
-  async talkContentGetById(id: string) {
+  async talkContentGetById(id: string, user: User) {
     const talkContet = await this.talkcontentRepository.findOne({
       where: { id },
       relations: ['like'],
@@ -121,6 +128,11 @@ export class TalkcontentsService {
       .leftJoinAndSelect('talkContent.comment', 'comment')
       .where('talkContent.id= :id', { id })
       .getOne();
+    if (talkContet) {
+      talkContet.isLiked = user
+        ? talkContet.like.some((like) => like.user.id === user.id)
+        : false;
+    }
 
     return { talkContent };
   }

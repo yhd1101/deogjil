@@ -76,16 +76,20 @@ export class ContentsController {
   @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
   @ApiQuery({ name: 'tag', required: false, description: '태그' })
   async getAllContent(
+    @Req() req: RequestWithUserInterface,
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
     @Query('sortType') sortType?: string,
     @Query('tag') tag?: string,
   ): Promise<PageDto<Content>> {
+    const user = req.user ? { id: req.user.id } : undefined;
+    console.log('2131231', user);
     return await this.contentsService.contentGetAll(
       pageOptionsDto,
       searchQuery,
       sortType,
       tag,
+      user,
     );
   }
 
@@ -94,9 +98,12 @@ export class ContentsController {
     summary: '글 상세페이지',
     description: '글 상세페이지 불러옴',
   })
-  async getContentById(@Param('id') id: string) {
+  async getContentById(
+    @Param('id') id: string,
+    @Req() req: RequestWithUserInterface,
+  ) {
     try {
-      const content = await this.contentsService.contentGetById(id);
+      const content = await this.contentsService.contentGetById(id, req.user);
       return content;
     } catch (err) {
       throw new NotFoundException('No Content');
@@ -114,7 +121,7 @@ export class ContentsController {
     @Req() req: RequestWithUserInterface,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log('dddd', id);
+    console.log('dddd', req.user);
     // 현재 사용자 정보를 서비스 레이어로 전달
     return await this.contentsService.contentUpdateById(
       id,

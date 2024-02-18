@@ -142,6 +142,7 @@ export class ContentsService {
     searchQuery?: string,
     sortType?: string,
     tag?: string,
+    user?: { id: string },
   ): Promise<PageDto<Content>> {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
@@ -181,11 +182,16 @@ export class ContentsService {
       .take(pageOptionsDto.take)
       .getManyAndCount();
 
+    for (const content of contentWithCommentCount) {
+      content.isLiked = user
+        ? content.like.some((like) => like.user.id === user.id)
+        : false;
+    }
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
 
-  async contentGetById(id: string) {
+  async contentGetById(id: string, user: User) {
     const content = await this.contentRepository
       .createQueryBuilder('content')
       .leftJoinAndSelect('content.writer', 'writer')
@@ -194,6 +200,11 @@ export class ContentsService {
       .where('content.id= :id', { id })
       .orderBy('comment.createdAt', 'DESC')
       .getOne();
+    if (content) {
+      content.isLiked = user
+        ? content.like.some((like) => like.user.id === user.id)
+        : false;
+    }
 
     return { content };
   }

@@ -73,16 +73,19 @@ export class TalkcontentsController {
   @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
   @ApiQuery({ name: 'tag', required: false, description: '태그' })
   async getAllTalkContents(
+    @Req() req: RequestWithUserInterface,
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('search') searchQuery?: string,
     @Query('sortType') sortType?: string,
     @Query('tag') tag?: string,
   ): Promise<PageDto<Talkcontent>> {
+    const user = req.user ? { id: req.user.id } : undefined;
     return await this.talkcontentsService.talkContentGetAll(
       pageOptionsDto,
       searchQuery,
       sortType,
       tag,
+      user,
     );
   }
 
@@ -91,9 +94,15 @@ export class TalkcontentsController {
     summary: '글 상세페이지',
     description: '글 상세페이지 불러옴',
   })
-  async getTalkContentById(@Param('id') id: string) {
+  async getTalkContentById(
+    @Param('id') id: string,
+    @Req() req: RequestWithUserInterface,
+  ) {
     try {
-      const content = await this.talkcontentsService.talkContentGetById(id);
+      const content = await this.talkcontentsService.talkContentGetById(
+        id,
+        req.user,
+      );
       return content;
     } catch (err) {
       throw new NotFoundException('No Content');
