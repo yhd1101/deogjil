@@ -77,7 +77,7 @@ export class CommentTalkContentService {
   async commentDelete(id: string, user: User) {
     const comment = await this.commentTalkContentRepository.findOne({
       where: { id },
-      relations: ['writer', 'talkContent'],
+      relations: ['writer', 'content'],
     });
     if (!comment) {
       throw new NotFoundException('Not Comment');
