@@ -30,14 +30,13 @@ export class LikeTalkContentService {
       user,
       ...createLikeTalkContentDto,
     });
-    console.log(newLike.content.id);
     console.log('23', newLike);
 
     const like = await this.likeTalkContentRepository
       .createQueryBuilder('likeTalkContent')
       .where('likeTalkContent.user = :userId', { userId: user.id })
-      .andWhere('likeTalkContent.talkContent = :talkContentId', {
-        talkContentId: newLike.content,
+      .andWhere('likeTalkContent.content = :contentId', {
+        contentId: newLike.content,
       })
       .getCount();
 
@@ -47,8 +46,7 @@ export class LikeTalkContentService {
       throw new ConflictException('already liked');
     }
 
-    const contentId = newLike.content;
-    console.log(contentId);
+    const contentId = createLikeTalkContentDto.content;
     // //
     // const id = createLikeTalkContentDto.talkcontent.id;
     // console.log('id:', id);
@@ -68,7 +66,7 @@ export class LikeTalkContentService {
     try {
       const like = await this.likeTalkContentRepository.findOne({
         where: { id },
-        relations: ['talkContent'],
+        relations: ['content'],
       });
       console.log(like);
 

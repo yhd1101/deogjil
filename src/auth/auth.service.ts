@@ -147,13 +147,15 @@ export class AuthService {
       secret: this.configService.get('REFRESHTOKEN_SECRET_KEY'),
       expiresIn: `${this.configService.get('REFRESHTOKEN_EXPIRATION_TIME')}`,
     });
-    //프론트에 쿠키 담아줌
+
+    // 프론트에 쿠키 담아줌
     const cookie = `Refresh=${refreshToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
-    )}`;
+    )}; SameSite=None; Secure`;
 
     return { cookie, refreshToken };
   }
+
   //로그아웃
   public getCookiesForLogOut() {
     return [`Authentication=; HttpOnly; path=/; Max-Age=0`];

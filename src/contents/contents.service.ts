@@ -147,12 +147,13 @@ export class ContentsService {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
+    queryBuilder.leftJoinAndSelect('contents.like', 'like'); // 'like'는 alias로 사용될 이름
+    queryBuilder.leftJoinAndSelect('like.user', 'user'); // 'user'는 alias로 사용될 이름
     if (tag) {
       queryBuilder.andWhere(':tag = ANY(contents.tag)', {
         tag,
       });
     }
-
     if (searchQuery) {
       console.log(searchQuery);
       queryBuilder.where(
@@ -175,6 +176,26 @@ export class ContentsService {
         queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
         break;
     }
+    if (user) {
+      const contentsWithLikes = await this.contentRepository.find({
+        relations: ['like.user'],
+      });
+
+      contentsWithLikes.forEach((content) => {
+        content.isLiked = content.like?.some(
+          (like) => like?.user && like?.user.id === user?.id,
+        );
+      });
+      console.log('e112', contentsWithLikes);
+    }
+
+    const result = await queryBuilder.getMany();
+    result.forEach((content) => {
+      content.isLiked = content.like.some(
+        (like) => like.user && like.user.id === user?.id,
+      );
+    });
+    console.log(result, '2312133');
 
     // 페이지네이션 로직을 여기서 수행
     const [contentWithCommentCount, itemCount] = await queryBuilder
@@ -182,13 +203,8 @@ export class ContentsService {
       .take(pageOptionsDto.take)
       .getManyAndCount();
 
-    for (const content of contentWithCommentCount) {
-      content.isLiked = user
-        ? content.like.some((like) => like.user.id === user.id)
-        : false;
-    }
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-    return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
+    return new PageDto<Content>(result, pageMetaDto);
   }
 
   async contentGetById(id: string, user: User) {

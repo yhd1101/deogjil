@@ -126,6 +126,7 @@ export class TalkcontentsService {
       .createQueryBuilder('talkContent')
       .leftJoinAndSelect('talkContent.writer', 'writer')
       .leftJoinAndSelect('talkContent.comment', 'comment')
+      .leftJoinAndSelect('comment.writer', 'commentWriter')
       .where('talkContent.id= :id', { id })
       .getOne();
     if (talkContet) {

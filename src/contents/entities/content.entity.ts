@@ -52,6 +52,7 @@ export class Content extends CommonEntity {
 
   @Column({ default: 0 })
   public likeCount: number;
-  @Column({ default: false })
+
+  @Column({ default: false }) // "isliked" 컬럼 추가
   public isLiked: boolean;
 }

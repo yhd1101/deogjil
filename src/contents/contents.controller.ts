@@ -82,7 +82,7 @@ export class ContentsController {
     @Query('sortType') sortType?: string,
     @Query('tag') tag?: string,
   ): Promise<PageDto<Content>> {
-    const user = req.user ? { id: req.user.id } : undefined;
+    const user = req.user;
     console.log('2131231', user);
     return await this.contentsService.contentGetAll(
       pageOptionsDto,
