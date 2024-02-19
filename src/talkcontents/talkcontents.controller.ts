@@ -33,6 +33,7 @@ import { Talkcontent } from './entities/talkcontent.entity';
 import { CreateContentDto } from '../contents/dto/create-content.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer.options';
+import { JwtOptionalAuthGuard } from '../auth/guards/jwtOptional-auth.guard';
 
 @ApiTags('talkContents')
 @Controller('talkcontents')
@@ -69,6 +70,7 @@ export class TalkcontentsController {
     summary: '덕질토크 전체조회',
     description: '덕질토크 전체조회해줌',
   })
+  @UseGuards(JwtOptionalAuthGuard)
   @ApiQuery({ name: 'search', required: false, description: '검색 유형' })
   @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
   @ApiQuery({ name: 'tag', required: false, description: '태그' })
@@ -79,7 +81,7 @@ export class TalkcontentsController {
     @Query('sortType') sortType?: string,
     @Query('tag') tag?: string,
   ): Promise<PageDto<Talkcontent>> {
-    const user = req.user ? { id: req.user.id } : undefined;
+    const user = req.user;
     return await this.talkcontentsService.talkContentGetAll(
       pageOptionsDto,
       searchQuery,
@@ -94,6 +96,7 @@ export class TalkcontentsController {
     summary: '글 상세페이지',
     description: '글 상세페이지 불러옴',
   })
+  @UseGuards(JwtOptionalAuthGuard)
   async getTalkContentById(
     @Param('id') id: string,
     @Req() req: RequestWithUserInterface,

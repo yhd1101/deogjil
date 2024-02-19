@@ -7,6 +7,7 @@ import { SearchModule } from '../search/search.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
+import { LikeTalkContent } from '../like-talk-content/entities/like-talk-content.entity';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import * as multer from 'multer';
       dest: './upload',
       storage: multer.memoryStorage(),
     }),
-    TypeOrmModule.forFeature([Talkcontent]),
+    TypeOrmModule.forFeature([Talkcontent, LikeTalkContent]),
     ConfigModule.forRoot(),
   ],
   controllers: [TalkcontentsController],

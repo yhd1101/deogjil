@@ -18,6 +18,7 @@ import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
 import { Content } from '../contents/entities/content.entity';
+import { LikeTalkContent } from '../like-talk-content/entities/like-talk-content.entity';
 
 @Injectable()
 export class TalkcontentsService {
@@ -26,6 +27,8 @@ export class TalkcontentsService {
   constructor(
     @InjectRepository(Talkcontent)
     private talkcontentRepository: Repository<Talkcontent>,
+    @InjectRepository(LikeTalkContent)
+    private likeTalkContentRepository: Repository<LikeTalkContent>,
     private readonly configService: ConfigService,
   ) {
     this.awsS3 = new AWS.S3({
@@ -102,26 +105,32 @@ export class TalkcontentsService {
         queryBuilder.addOrderBy('talkContents.createdAt', pageOptionsDto.order);
         break;
     }
-    // 페이지네이션 로직을 여기서 수행
-    const [contentWithCommentCount, itemCount] = await queryBuilder
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
-      .getManyAndCount();
-
-    for (const content of contentWithCommentCount) {
-      content.isLiked = user
-        ? content.like.some((like) => like.user.id === user.id)
-        : false;
+    let contentWithCommentCount: Talkcontent[] = [];
+    let itemCount = 0;
+    if (user) {
+      const likes = await this.likeTalkContentRepository.find({
+        where: { user: { id: user.id } },
+        relations: ['content'],
+      });
+      const contentIdsWithLikes = likes.map((like) => like.content.id);
+      [contentWithCommentCount, itemCount] = await queryBuilder
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .getManyAndCount();
+      contentWithCommentCount.forEach((content) => {
+        content.isLiked = contentIdsWithLikes.includes(content.id);
+      });
+    } else {
+      [contentWithCommentCount, itemCount] = await queryBuilder
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .getManyAndCount();
     }
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto<Talkcontent>(contentWithCommentCount, pageMetaDto);
   }
 
   async talkContentGetById(id: string, user: User) {
-    const talkContet = await this.talkcontentRepository.findOne({
-      where: { id },
-      relations: ['like'],
-    });
     const talkContent = await this.talkcontentRepository
       .createQueryBuilder('talkContent')
       .leftJoinAndSelect('talkContent.writer', 'writer')
@@ -129,10 +138,14 @@ export class TalkcontentsService {
       .leftJoinAndSelect('comment.writer', 'commentWriter')
       .where('talkContent.id= :id', { id })
       .getOne();
-    if (talkContet) {
-      talkContet.isLiked = user
-        ? talkContet.like.some((like) => like.user.id === user.id)
-        : false;
+    if (user) {
+      const likes = await this.likeTalkContentRepository.find({
+        where: { user: { id: user.id } },
+        relations: ['content'],
+      });
+      talkContent.isLiked = likes.some(
+        (like) => like.content.id === talkContent.id,
+      );
     }
 
     return { talkContent };

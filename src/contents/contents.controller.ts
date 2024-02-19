@@ -33,6 +33,7 @@ import { PageDto } from '../common/dtos/page.dto';
 import { Content } from './entities/content.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../common/utils/multer.options';
+import { JwtOptionalAuthGuard } from '../auth/guards/jwtOptional-auth.guard';
 
 @ApiTags('Content')
 @Controller('content')
@@ -57,7 +58,6 @@ export class ContentsController {
     @Body() createContentDto: CreateContentDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log('22222', files);
     const newContent = await this.contentsService.contentCreate(
       createContentDto,
       req.user,
@@ -72,6 +72,7 @@ export class ContentsController {
     description:
       '전체 글 조회 sortType= like(좋아요 많은순), sortType=commentcount (댓글많은순)',
   })
+  @UseGuards(JwtOptionalAuthGuard)
   @ApiQuery({ name: 'search', required: false, description: '검색 유형' })
   @ApiQuery({ name: 'sortType', required: false, description: '정렬 유형' })
   @ApiQuery({ name: 'tag', required: false, description: '태그' })
@@ -96,14 +97,16 @@ export class ContentsController {
   @Get(':id')
   @ApiOperation({
     summary: '글 상세페이지',
-    description: '글 상세페이지 불러옴',
+    description: '글 상세페이지  불러옴',
   })
+  @UseGuards(JwtOptionalAuthGuard)
   async getContentById(
     @Param('id') id: string,
     @Req() req: RequestWithUserInterface,
   ) {
     try {
-      const content = await this.contentsService.contentGetById(id, req.user);
+      const user = req.user;
+      const content = await this.contentsService.contentGetById(id, user);
       return content;
     } catch (err) {
       throw new NotFoundException('No Content');

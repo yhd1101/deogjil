@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
+import { Like } from '../likes/entities/like.entity';
 
 @Injectable()
 export class ContentsService {
@@ -24,6 +25,7 @@ export class ContentsService {
   public readonly S3_BUCKET_NAME: string;
   constructor(
     @InjectRepository(Content) private contentRepository: Repository<Content>,
+    @InjectRepository(Like) private likeRepository: Repository<Like>,
     private readonly configService: ConfigService,
   ) {
     this.awsS3 = new AWS.S3({
@@ -137,6 +139,78 @@ export class ContentsService {
     return imageUrls;
   }
 
+  // async contentGetAll(
+  //   pageOptionsDto: PageOptionsDto,
+  //   searchQuery?: string,
+  //   sortType?: string,
+  //   tag?: string,
+  //   user?: { id: string },
+  // ): Promise<PageDto<Content>> {
+  //   const queryBuilder =
+  //     await this.contentRepository.createQueryBuilder('contents');
+  //   queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
+  //   if (tag) {
+  //     queryBuilder.andWhere(':tag = ANY(contents.tag)', {
+  //       tag,
+  //     });
+  //   }
+  //   if (searchQuery) {
+  //     console.log(searchQuery);
+  //     queryBuilder.where(
+  //       'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery OR :searchQuery = ANY(contents.tag)',
+  //       { searchQuery: `%${searchQuery}%` },
+  //     );
+  //     queryBuilder.andWhere(':searchQuery = ANY(contents.tag)', {
+  //       searchQuery,
+  //     });
+  //   }
+  //
+  //   switch (sortType) {
+  //     case 'like':
+  //       queryBuilder.addOrderBy('contents.likeCount', 'DESC');
+  //       break;
+  //     case 'commentcount':
+  //       queryBuilder.addOrderBy('contents.commentCount', 'DESC');
+  //       break;
+  //     default:
+  //       queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
+  //       break;
+  //   }
+  //   let contentWithCommentCount: Content[] = [];
+  //   let itemCount = 0;
+  //
+  //   if (user) {
+  //     // 좋아요 정보 가져오기
+  //     const likes = await this.likeRepository.find({
+  //       where: { user: { id: user.id } },
+  //       relations: ['content'],
+  //     });
+  //
+  //     // 좋아요 정보 매핑
+  //     const contentsWithLikes = likes.map((like) => {
+  //       const content = like.content;
+  //       content.isLiked = true;
+  //       return content;
+  //     });
+  //
+  //     itemCount = contentsWithLikes.length;
+  //
+  //     // 페이징 적용
+  //     contentWithCommentCount = contentsWithLikes.slice(
+  //       pageOptionsDto.skip,
+  //       pageOptionsDto.skip + pageOptionsDto.take,
+  //     );
+  //   } else {
+  //     // 사용자가 없는 경우
+  //     [contentWithCommentCount, itemCount] = await queryBuilder
+  //       .skip(pageOptionsDto.skip)
+  //       .take(pageOptionsDto.take)
+  //       .getManyAndCount();
+  //   }
+  //
+  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+  //   return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
+  // }
   async contentGetAll(
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
@@ -147,8 +221,6 @@ export class ContentsService {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
-    queryBuilder.leftJoinAndSelect('contents.like', 'like'); // 'like'는 alias로 사용될 이름
-    queryBuilder.leftJoinAndSelect('like.user', 'user'); // 'user'는 alias로 사용될 이름
     if (tag) {
       queryBuilder.andWhere(':tag = ANY(contents.tag)', {
         tag,
@@ -176,35 +248,36 @@ export class ContentsService {
         queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
         break;
     }
+
+    let contentWithCommentCount: Content[] = [];
+    let itemCount = 0;
+
     if (user) {
-      const contentsWithLikes = await this.contentRepository.find({
-        relations: ['like.user'],
+      const likes = await this.likeRepository.find({
+        where: { user: { id: user.id } },
+        relations: ['content'],
       });
 
-      contentsWithLikes.forEach((content) => {
-        content.isLiked = content.like?.some(
-          (like) => like?.user && like?.user.id === user?.id,
-        );
+      const contentIdsWithLikes = likes.map((like) => like.content.id);
+
+      [contentWithCommentCount, itemCount] = await queryBuilder
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .getManyAndCount();
+
+      contentWithCommentCount.forEach((content) => {
+        content.isLiked = contentIdsWithLikes.includes(content.id);
       });
-      console.log('e112', contentsWithLikes);
+    } else {
+      // 사용자가 없는 경우
+      [contentWithCommentCount, itemCount] = await queryBuilder
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .getManyAndCount();
     }
 
-    const result = await queryBuilder.getMany();
-    result.forEach((content) => {
-      content.isLiked = content.like.some(
-        (like) => like.user && like.user.id === user?.id,
-      );
-    });
-    console.log(result, '2312133');
-
-    // 페이지네이션 로직을 여기서 수행
-    const [contentWithCommentCount, itemCount] = await queryBuilder
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
-      .getManyAndCount();
-
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-    return new PageDto<Content>(result, pageMetaDto);
+    return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
 
   async contentGetById(id: string, user: User) {
@@ -216,10 +289,12 @@ export class ContentsService {
       .where('content.id= :id', { id })
       .orderBy('comment.createdAt', 'DESC')
       .getOne();
-    if (content) {
-      content.isLiked = user
-        ? content.like.some((like) => like.user.id === user.id)
-        : false;
+    if (user) {
+      const likes = await this.likeRepository.find({
+        where: { user: { id: user.id } },
+        relations: ['content'],
+      });
+      content.isLiked = likes.some((like) => like.content.id === content.id);
     }
 
     return { content };
