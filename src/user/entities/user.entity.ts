@@ -86,6 +86,9 @@ export class User extends CommonEntity {
   async beforeSaveFunction(): Promise<void> {
     try {
       if (this.provider !== Provider.LOCAL) {
+        if (!this.nickname && this.name) {
+          this.nickname = this.name;
+        }
         return;
       } else {
         const saltValue = await bcrypt.genSalt(10);
@@ -97,7 +100,7 @@ export class User extends CommonEntity {
           d: 'mm',
           protocol: 'https',
         });
-        if (this.name) {
+        if (this.name && !this.nickname) {
           this.nickname = this.name;
         }
       }

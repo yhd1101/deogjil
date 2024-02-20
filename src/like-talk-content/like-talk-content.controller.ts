@@ -52,7 +52,7 @@ export class LikeTalkContentController {
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({
     summary: '덕질토크 좋아요취소',
-    description: '덕질토크 좋아요취소',
+    description: '덕질토크 좋아요취소 likeid 입력',
   })
   async likeCancel(@Param('id') id: string) {
     await this.likeTalkContentService.deleteLike(id);

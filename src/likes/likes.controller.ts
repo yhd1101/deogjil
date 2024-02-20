@@ -43,7 +43,10 @@ export class LikesController {
   @Delete(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
-  @ApiOperation({ summary: '좋아요 취소', description: ' 좋아요취소' })
+  @ApiOperation({
+    summary: '좋아요 취소',
+    description: ' 좋아요취소 like id 입력',
+  })
   async likeDelete(@Param('id') id: string) {
     console.log('ddd', id);
     await this.likesService.deleteLike(id);
