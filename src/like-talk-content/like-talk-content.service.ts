@@ -65,16 +65,15 @@ export class LikeTalkContentService {
   async deleteLike(id: string) {
     try {
       const like = await this.likeTalkContentRepository.findOne({
-        where: { id },
+        where: { content: { id } },
         relations: ['content'],
       });
-      console.log(like);
 
       if (!like) {
         throw new NotFoundException('like not found');
       }
       const contentId = like.content.id;
-      await this.likeTalkContentRepository.delete(id);
+      await this.likeTalkContentRepository.delete(like.id);
       await this.talkcontentRepository
         .createQueryBuilder()
         .update(Talkcontent)
