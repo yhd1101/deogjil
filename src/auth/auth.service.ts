@@ -155,7 +155,7 @@ export class AuthService {
     // 변경된 코드
     const cookie = `Refresh=${refreshToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
-    )}; SameSite=Lax; Secure=false; Domain=localhost;`;
+    )}; SameSite=Lax; Domain=localhost;`;
 
     return { cookie, refreshToken };
   }
