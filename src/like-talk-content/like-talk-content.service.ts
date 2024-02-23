@@ -11,8 +11,6 @@ import { LikeTalkContent } from './entities/like-talk-content.entity';
 import { Repository } from 'typeorm';
 import { Talkcontent } from '../talkcontents/entities/talkcontent.entity';
 import { User } from '../user/entities/user.entity';
-import { Content } from '../contents/entities/content.entity';
-import { CreateLikeDto } from '../likes/dto/create-like.dto';
 @Injectable()
 export class LikeTalkContentService {
   constructor(
