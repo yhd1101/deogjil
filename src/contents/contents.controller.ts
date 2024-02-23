@@ -84,7 +84,6 @@ export class ContentsController {
     @Query('tag') tag?: string,
   ): Promise<PageDto<Content>> {
     const user = req.user;
-    console.log('2131231', user);
     return await this.contentsService.contentGetAll(
       pageOptionsDto,
       searchQuery,

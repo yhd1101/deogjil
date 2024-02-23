@@ -369,8 +369,6 @@ export class ContentsService {
 
       // updatedAt 갱신
 
-      // await this.contentRepository.save(content);
-
       return 'Updated content';
     } catch (error) {
       console.error('Error updating content:', error);
