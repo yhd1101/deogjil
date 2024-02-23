@@ -53,14 +53,14 @@ export class LikesService {
   async deleteLike(id: string) {
     try {
       const like = await this.likeRepository.findOne({
-        where: { id },
+        where: { content: { id } },
         relations: ['content'],
       });
       if (!like) {
         throw new NotFoundException('like not found');
       }
       const contentId = like.content.id;
-      await this.likeRepository.delete(id);
+      await this.likeRepository.delete(like.id);
       await this.contentRepository
         .createQueryBuilder()
         .update(Content)

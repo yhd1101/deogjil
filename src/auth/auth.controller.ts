@@ -136,7 +136,6 @@ export class AuthController {
     return { accessToken, user };
   }
 
-  //refreshtoken api
   @UseGuards(JwtRefreshAuthGuard)
   @ApiBearerAuth('access-token')
   @Get('refresh')

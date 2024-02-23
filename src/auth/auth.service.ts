@@ -148,10 +148,14 @@ export class AuthService {
       expiresIn: `${this.configService.get('REFRESHTOKEN_EXPIRATION_TIME')}`,
     });
 
-    // 프론트에 쿠키 담아줌
+    // // 프론트에 쿠키 담아줌
+    // const cookie = `Refresh=${refreshToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
+    //   'REFRESHTOKEN_EXPIRATION_TIME',
+    // )}; SameSite=None; Secure`;
+    // 변경된 코드
     const cookie = `Refresh=${refreshToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
-    )}; SameSite=None; Secure`;
+    )}; SameSite=Lax; Domain=localhost;`;
 
     return { cookie, refreshToken };
   }
