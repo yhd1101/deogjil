@@ -26,5 +26,3 @@ jobs:
       - name: Build Docker image
         run: docker buildx create --use && docker buildx build --platform linux/amd64 -t your-image-name:latest .
 
-      - name: Start Docker Compose
-        run: sudo docker compose up -d
