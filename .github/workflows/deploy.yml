@@ -14,12 +14,10 @@ jobs:
           mkdir -p ~/.ssh/
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-
       - name: Set up SSH
         run: |
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
-
       - name: Deploy
         run: |
           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_PUBLIC_IP }} "
