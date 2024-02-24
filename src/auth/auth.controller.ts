@@ -147,7 +147,6 @@ export class AuthController {
     return req.user;
   }
 
-  //로그아웃
   @UseGuards(JwtAccessAuthGuard)
   @ApiBearerAuth('access-token')
   @Post('logout')
