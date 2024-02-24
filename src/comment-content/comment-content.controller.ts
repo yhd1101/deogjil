@@ -32,7 +32,7 @@ export class CommentContentController {
   @ApiBody({ type: CreateCommentContentDto })
   @ApiOperation({
     summary: '덕질자랑 글쓰기 댓글',
-    description: '댓글작성',
+    description: '댓글작성ddldldldl',
   })
   @ApiResponse({
     description: 'create content Comment',

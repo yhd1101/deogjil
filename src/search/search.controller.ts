@@ -22,8 +22,8 @@ export class SearchController {
 
   @Get()
   @ApiOperation({
-    summary: '검색기능',
-    description: '전체검색 searchQuery=입력값, tag=태그값 입력',
+    summary: '검색기능 Test',
+    description: '전체검색 searchQuery=입력값, tag=태그값 입력 Test',
   })
   @ApiQuery({ name: 'searchQuery', required: false, description: '검색 유형' })
   @ApiQuery({ name: 'tag', required: false, description: '태그' })
