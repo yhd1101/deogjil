@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,4 +22,6 @@ jobs:
           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_PUBLIC_IP }} "
             cd deogjil
             git pull
+          
+          
           "
