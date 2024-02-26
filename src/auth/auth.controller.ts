@@ -58,8 +58,8 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({
-    summary: '로그인API',
-    description: '로그인해주는 api입니다 login',
+    summary: '로그인API!!!!!!!!!!!!!!!!!!',
+    description: '로그인해주는 api입니다 login!!!',
   })
   @ApiCreatedResponse({ description: '로그인함', type: User })
   @ApiBody({ type: LoginUserDto })
