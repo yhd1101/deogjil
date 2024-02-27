@@ -85,12 +85,8 @@ export class TalkcontentsService {
     }
 
     if (searchQuery) {
-      queryBuilder.where(
-        'talkContents.title LIKE :searchQuery OR talkContents.desc LIKE :searchQuery OR :searchQuery = ANY(talkContents.tag)',
-        { searchQuery: `%${searchQuery}%` },
-      );
-      queryBuilder.andWhere(':searchQuery = ANY(talkContents.tag)', {
-        searchQuery,
+      queryBuilder.where('talkContents.title LIKE :searchQuery', {
+        searchQuery: `%${searchQuery}%`,
       });
     }
 
