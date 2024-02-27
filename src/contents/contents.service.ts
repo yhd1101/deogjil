@@ -19,8 +19,8 @@ import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
 import { Like } from '../likes/entities/like.entity';
-import { CACHE_MANAGER } from '@nestjs/common/cache';
-import { Cache } from 'cache-manager';
+// import { CACHE_MANAGER } from '@nestjs/common/cache';
+// import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ContentsService {
@@ -29,7 +29,7 @@ export class ContentsService {
   constructor(
     @InjectRepository(Content) private contentRepository: Repository<Content>,
     @InjectRepository(Like) private likeRepository: Repository<Like>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly configService: ConfigService,
   ) {
     this.awsS3 = new AWS.S3({
@@ -63,7 +63,7 @@ export class ContentsService {
 
       // 콘텐츠 저장
       await this.contentRepository.save(newContent);
-      await this.cacheManager.del('contents');
+      // await this.cacheManager.del('contents');
       return newContent;
     } catch (error) {
       // 오류 처리
@@ -149,11 +149,11 @@ export class ContentsService {
     tag?: string,
     user?: { id: string },
   ): Promise<PageDto<Content>> {
-    const redisData = await this.cacheManager.get('contents');
-    if (redisData) {
-      console.log(redisData.length);
-      return redisData;
-    }
+    // const redisData = await this.cacheManager.get('contents');
+    // if (redisData) {
+    //   console.log(redisData.length);
+    //   return redisData;
+    // }
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
@@ -216,10 +216,6 @@ export class ContentsService {
     //   meta: pageMetaDto,
     // };
     // await this.cacheManager.set('contents', cachedData);
-    // await this.cacheManager.set('contents', {
-    //   contentWithCommentCount,
-    //   pageMetaDto,
-    // });
     return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
 

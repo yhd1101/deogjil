@@ -12,7 +12,7 @@ import { CommentContentModule } from './comment-content/comment-content.module';
 import { CommentTalkContentModule } from './comment-talk-content/comment-talk-content.module';
 import { SearchModule } from './search/search.module';
 import { LikeTalkContentModule } from './like-talk-content/like-talk-content.module';
-import { RedisModule } from './redis/redis.module';
+// import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { RedisModule } from './redis/redis.module';
     CommentTalkContentModule,
     SearchModule,
     LikeTalkContentModule,
-    RedisModule,
+    // RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
