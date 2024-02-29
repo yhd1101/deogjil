@@ -4,21 +4,15 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
   HttpCode,
   UseGuards,
   Req,
-  Res,
   Query,
-  BadRequestException,
-  UnauthorizedException,
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { KakaoAuthGuard } from './guards/kakao-auth.guard';
 import { UserService } from '../user/user.service';
 import { JwtRefreshAuthGuard } from './guards/jwtRefresh-auth.guard';
@@ -29,7 +23,6 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '../user/entities/user.entity';
@@ -37,7 +30,6 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from '../common/utils/multer.options';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 @ApiTags('Auth')
 @Controller('auth')
@@ -51,7 +43,7 @@ export class AuthController {
   @ApiCreatedResponse({
     description: 'the record has been success with user',
     type: User,
-  }) //성공시 응답을 해주겠다.
+  })
   async userSignup(@Body() createUserDto: CreateUserDto) {
     return await this.authService.createUser(createUserDto);
   }
@@ -74,7 +66,6 @@ export class AuthController {
     req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
 
     return { accessToken, user };
-    // return await this.authService.Login(loginUserDto);
   }
 
   @Get('profile')

@@ -17,7 +17,6 @@ import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
-import { Content } from '../contents/entities/content.entity';
 import { LikeTalkContent } from '../like-talk-content/entities/like-talk-content.entity';
 
 @Injectable()

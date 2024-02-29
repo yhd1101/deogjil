@@ -20,7 +20,6 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
-  ApiCreatedResponse,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -32,7 +31,6 @@ import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Content } from './entities/content.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from '../common/utils/multer.options';
 import { JwtOptionalAuthGuard } from '../auth/guards/jwtOptional-auth.guard';
 
 @ApiTags('Content')

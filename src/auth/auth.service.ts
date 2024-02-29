@@ -79,9 +79,6 @@ export class AuthService {
       secret: this.configService.get('ACCESSTOKEN_SECRET_KEY'),
       expiresIn: `${this.configService.get('ACCESSTOKEN_EXPIRATION_TIME')}m`,
     });
-    // return `Authentication=${accessToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
-    //   'ACCESSTOKEN_EXPIRATION_TIME',
-    // )}`;
 
     return accessToken;
   }
@@ -148,11 +145,6 @@ export class AuthService {
       expiresIn: `${this.configService.get('REFRESHTOKEN_EXPIRATION_TIME')}`,
     });
 
-    // // 프론트에 쿠키 담아줌
-    // const cookie = `Refresh=${refreshToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
-    //   'REFRESHTOKEN_EXPIRATION_TIME',
-    // )}; SameSite=None; Secure`;
-    // 변경된 코드
     const cookie = `Refresh=${refreshToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
     )}; SameSite=Lax; Domain=localhost;`;

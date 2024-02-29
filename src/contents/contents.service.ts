@@ -125,16 +125,12 @@ export class ContentsService {
   async uploadImg(files: Express.Multer.File[]) {
     const imageUrls = [];
 
-    // files가 undefined나 null인 경우 처리
     if (files) {
-      // Object.values를 사용하여 객체를 배열로 변환
       const fileList = Object.values(files);
 
       // 각 파일에 대해 이미지 업로드 로직을 수행
       for (const file of fileList) {
         const fileName = `content/${file.filename}`;
-        // 파일을 저장하거나 다른 로직 수행 가능
-        // 여기에서는 이미지 URL을 생성하여 저장
         imageUrls.push(`http://localhost:8000//${fileName}`);
       }
     }

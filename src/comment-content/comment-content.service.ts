@@ -45,22 +45,6 @@ export class CommentContentService {
     return newComment;
   }
 
-  // async commentCreate(
-  //   createCommentContentDto: CreateCommentContentDto,
-  //   user: User,
-  // ) {
-  //   const newComment = await this.commentContentRepository.create({
-  //     ...createCommentContentDto,
-  //     writer: user,
-  //   });
-  //
-  //   console.log(newComment);
-  //   const contentId = createCommentContentDto.content;
-  //
-  //   await this.commentContentRepository.save(newComment);
-  //   // 댓글 생성 후, 해당 컨텐츠의 댓글 개수를 업데이트
-  //   return newComment;
-  // }
   async commentUpdate(
     id: string,
     updateCommentContentDto: UpdateCommentContentDto,
