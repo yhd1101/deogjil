@@ -8,7 +8,6 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from './common/interceptors/transfrom.interceptor';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as moment from 'moment-timezone';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

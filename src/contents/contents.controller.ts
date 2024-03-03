@@ -121,7 +121,6 @@ export class ContentsController {
     @Req() req: RequestWithUserInterface,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log('dddd', req.user);
     // 현재 사용자 정보를 서비스 레이어로 전달
     return await this.contentsService.contentUpdateById(
       id,

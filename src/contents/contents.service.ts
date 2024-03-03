@@ -67,7 +67,7 @@ export class ContentsService {
       return newContent;
     } catch (error) {
       // 오류 처리
-      console.error('Error creating content:', error);
+
       throw new BadRequestException('Failed to create content');
     }
   }
@@ -134,7 +134,6 @@ export class ContentsService {
         imageUrls.push(`http://localhost:8000//${fileName}`);
       }
     }
-    console.log('ddd12', imageUrls);
 
     return imageUrls;
   }

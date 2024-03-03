@@ -13,10 +13,6 @@ import { LoginUserDto } from '../user/dto/login-user.dto';
 import { Provider } from '../user/entities/provider.enum';
 import * as qs from 'qs';
 import axios from 'axios';
-import { User } from '../user/entities/user.entity';
-import { KakaoAuthStrategy } from './strategies/kakao-auth.strategy';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Injectable()

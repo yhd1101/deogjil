@@ -47,7 +47,6 @@ export class LikesController {
     description: ' 좋아요취소 like id 입력',
   })
   async likeDelete(@Param('contentId') contentId: string) {
-    console.log('ddd', contentId);
     await this.likesService.deleteLike(contentId);
   }
 }

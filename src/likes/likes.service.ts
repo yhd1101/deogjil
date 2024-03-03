@@ -25,7 +25,6 @@ export class LikesService {
       user,
       ...createLikeDto,
     });
-    console.log(newLike.content);
 
     const likeCount = await this.likeRepository
       .createQueryBuilder('like')
