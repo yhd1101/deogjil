@@ -35,6 +35,6 @@ async function bootstrap() {
     prefix: '/media',
   });
   console.log('git testsssss');
-  await app.listen(443);
+  await app.listen(8000);
 }
 bootstrap();
