@@ -17,8 +17,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:8000',
       'http://localhost:8000/api-docs',
-      'http://duckfull.duckdns.org',
-      'http://localhost:3000',
+      'https://www.dukpool.co.kr',
     ],
     credentials: true,
   });
