@@ -34,6 +34,6 @@ async function bootstrap() {
   app.useStaticAssets(path.join(__dirname, './common', 'uploads'), {
     prefix: '/media',
   });
-  await app.listen(443);
+  await app.listen(8000);
 }
 bootstrap();
