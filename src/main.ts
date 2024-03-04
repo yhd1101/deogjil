@@ -34,7 +34,6 @@ async function bootstrap() {
   app.useStaticAssets(path.join(__dirname, './common', 'uploads'), {
     prefix: '/media',
   });
-  console.log('git testsssss');
-  await app.listen(8000);
+  await app.listen(443);
 }
 bootstrap();
