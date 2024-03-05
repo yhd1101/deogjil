@@ -141,9 +141,9 @@ export class AuthService {
       expiresIn: `${this.configService.get('REFRESHTOKEN_EXPIRATION_TIME')}`,
     });
 
-    const cookie = `Refresh=${refreshToken}; HttpOnly; path=/; Max-Age=${this.configService.get(
+    const cookie = `Refresh=${refreshToken}; HttpOnly; Secure; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
-    )}; SameSite=Lax; Domain=localhost;`;
+    )}; SameSite=Lax; Domain=www.dukpool.co.kr;`;
 
     return { cookie, refreshToken };
   }
