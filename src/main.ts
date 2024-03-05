@@ -18,6 +18,7 @@ async function bootstrap() {
       'http://localhost:8000',
       'http://localhost:8000/api-docs',
       'https://www.dukpool.co.kr',
+      'http://localhost:3000',
     ],
     credentials: true,
   });
