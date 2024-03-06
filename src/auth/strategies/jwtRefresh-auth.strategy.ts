@@ -37,6 +37,7 @@ export class JwtRefreshAuthStrategy extends PassportStrategy(
     );
 
     if (!isValid) {
+      req.res.clearCookie('Refresh');
       throw new UnauthorizedException('Refresh token expired or invalid');
     }
 
