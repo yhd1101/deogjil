@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { TokenPayloadInterface } from '../tokenPayload.interface';
 
 @Injectable()
-export class JwtAccessAuthStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private userService: UserService,
     private configService: ConfigService,
@@ -18,6 +18,7 @@ export class JwtAccessAuthStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: TokenPayloadInterface) {
+    console.log('2222', payload);
     return this.userService.getUserById(payload.userId);
   }
 }

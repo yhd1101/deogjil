@@ -11,13 +11,14 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { KakaoAuthGuard } from './guards/kakao-auth.guard';
 import { UserService } from '../user/user.service';
 import { JwtRefreshAuthGuard } from './guards/jwtRefresh-auth.guard';
 import { RequestWithUserInterface } from './requestWithUser.interface';
-import { JwtAccessAuthGuard } from './guards/jwtAccess-auth.guard';
+
 import {
   ApiBearerAuth,
   ApiBody,
@@ -31,6 +32,7 @@ import { LoginUserDto } from '../user/dto/login-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { JwtAccessAuthGuard } from './guards/jwtAccess-auth.guard';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -129,15 +131,25 @@ export class AuthController {
     return { accessToken, user };
   }
 
+  // @UseGuards(JwtRefreshAuthGuard)
+  // @Post('refresh')
+  // async refreshToken(@Req() req: RequestWithUserInterface) {
+  //   const user = req.user;
+  //   // 새로운 액세스 토큰 발급
+  //   const accessToken = await this.authService.generateAccessToken(user.id);
+  //   console.log(accessToken);
+  //   return accessToken;
+  // }
+
+  @Get('/refresh')
   @UseGuards(JwtRefreshAuthGuard)
-  @ApiBearerAuth('access-token')
-  @Get('refresh')
-  async refreshToken(@Req() req: RequestWithUserInterface) {
+  async refresh(@Req() req: RequestWithUserInterface) {
+    console.log('+++++++', req.user);
     const accessTokenCookie = await this.authService.generateAccessToken(
       req.user.id,
     );
-    req.res.setHeader('Set-Cookie', accessTokenCookie);
-    return req.user;
+    // req.res.setHeader('Set-Cookie', accessTokenCookie);
+    return accessTokenCookie;
   }
 
   @UseGuards(JwtAccessAuthGuard)
@@ -146,6 +158,7 @@ export class AuthController {
   @HttpCode(200)
   async logOut(@Req() req: RequestWithUserInterface) {
     await this.userService.removeRefreshToken(req.user.id);
-    req.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
+    req.res.clearCookie('');
+    return 'logout';
   }
 }
