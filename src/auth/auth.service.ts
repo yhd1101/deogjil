@@ -88,7 +88,7 @@ export class AuthService {
 
     const cookie = `Refresh=${refreshToken}; HttpOnly; Secure; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
-    )}; SameSite=None; Domain=www.dukpool.co.kr`;
+    )}; SameSite=None; Domain=.dukpool.co.kr`;
 
     return { cookie, refreshToken };
   }
