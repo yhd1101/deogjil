@@ -81,7 +81,6 @@ export class AuthService {
 
   public generateRefreshToken(userId: string) {
     const payload: TokenPayloadInterface = { userId };
-    console.log('____++', payload);
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get('REFRESHTOKEN_SECRET_KEY'),
       expiresIn: `${this.configService.get('REFRESHTOKEN_EXPIRATION_TIME')}m`,
@@ -89,7 +88,7 @@ export class AuthService {
 
     const cookie = `Refresh=${refreshToken}; HttpOnly; Secure; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
-    )}; SameSite=None; Domain=www.dukpool.co.kr`;
+    )}; SameSite=None; Domain=.dukpool.co.kr`;
 
     return { cookie, refreshToken };
   }
