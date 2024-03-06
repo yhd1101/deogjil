@@ -85,10 +85,13 @@ export class AuthService {
       secret: this.configService.get('REFRESHTOKEN_SECRET_KEY'),
       expiresIn: `${this.configService.get('REFRESHTOKEN_EXPIRATION_TIME')}m`,
     });
-
+    //
     const cookie = `Refresh=${refreshToken}; HttpOnly; Secure; path=/; Max-Age=${this.configService.get(
       'REFRESHTOKEN_EXPIRATION_TIME',
     )}; SameSite=None; Domain=.dukpool.co.kr`;
+    // const cookie = `Refresh=${refreshToken}; HttpOnly; SameSite=None; path=/; Max-Age=${this.configService.get(
+    //   'REFRESHTOKEN_EXPIRATION_TIME',
+    // )}; Domain=localhost`;
 
     return { cookie, refreshToken };
   }
