@@ -144,22 +144,18 @@ export class ContentsService {
     tag?: string,
     user?: { id: string },
   ): Promise<PageDto<Content>> {
-    // const redisData = await this.cacheManager.get('contents');
-    // if (redisData) {
-    //   console.log(redisData.length);
-    //   return redisData;
-    // }
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
-    if (tag) {
-      queryBuilder.andWhere(':tag = ANY(contents.tag)', {
-        tag,
-      });
-    }
+
     if (searchQuery) {
       queryBuilder.where('contents.title LIKE :searchQuery', {
         searchQuery: `%${searchQuery}%`,
+      });
+    }
+    if (tag) {
+      queryBuilder.andWhere(':tag = ANY(contents.tag)', {
+        tag,
       });
     }
 
@@ -194,23 +190,16 @@ export class ContentsService {
       contentWithCommentCount.forEach((content) => {
         content.isLiked = contentIdsWithLikes.includes(content.id);
       });
-      // await this.cacheManager.set('contents', contentWithCommentCount);
     } else {
       // 사용자가 없는 경우
       [contentWithCommentCount, itemCount] = await queryBuilder
         .skip(pageOptionsDto.skip)
         .take(pageOptionsDto.take)
         .getManyAndCount();
-      // await this.cacheManager.set('contents', contentWithCommentCount);
     }
 
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
 
-    // const cachedData = {
-    //   contents: contentWithCommentCount,
-    //   meta: pageMetaDto,
-    // };
-    // await this.cacheManager.set('contents', cachedData);
     return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
 

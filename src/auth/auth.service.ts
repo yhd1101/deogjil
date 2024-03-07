@@ -75,7 +75,6 @@ export class AuthService {
       secret: this.configService.get('ACCESSTOKEN_SECRET_KEY'),
       expiresIn: `${this.configService.get('ACCESSTOKEN_EXPIRATION_TIME')}m`,
     });
-
     return accessToken;
   }
 

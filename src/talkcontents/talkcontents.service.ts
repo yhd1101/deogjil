@@ -77,15 +77,15 @@ export class TalkcontentsService {
     const queryBuilder =
       await this.talkcontentRepository.createQueryBuilder('talkContents');
     queryBuilder.leftJoinAndSelect('talkContents.writer', 'writer');
-    if (tag) {
-      queryBuilder.andWhere(':tag = ANY(talkContents.tag)', {
-        tag,
-      });
-    }
 
     if (searchQuery) {
       queryBuilder.where('talkContents.title LIKE :searchQuery', {
         searchQuery: `%${searchQuery}%`,
+      });
+    }
+    if (tag) {
+      queryBuilder.andWhere(':tag = ANY(talkContents.tag)', {
+        tag,
       });
     }
 
