@@ -18,36 +18,47 @@ export class HttpExceptionFilter implements ExceptionFilter {
       | string
       | { error: string; statusCode: number; message: string | string[] };
 
-    if (exception instanceof UnauthorizedException) {
-      // UnauthorizedException의 경우 원하는 메시지로 변경
-      response.status(status).json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        message: 'Expired AccessToken',
-        data: null,
-      });
-    } else if (status === 401 && request.url.includes('refresh')) {
+    if (request.url.includes('/refresh')) {
       // RefreshToken 에러 처리
-      response.status(status).json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        message: 'Expired RefreshToken',
-        data: null,
-      });
-    } else if (typeof error === 'string') {
-      response.status(status).json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        message: error,
-        data: null,
-      });
+      if (status === 401) {
+        response.status(status).json({
+          statusCode: status,
+          timestamp: new Date().toISOString(),
+          message: 'Expired RefreshToken',
+          data: null,
+        });
+      } else {
+        response.status(status).json({
+          statusCode: status,
+          timestamp: new Date().toISOString(),
+          message: error,
+          data: null,
+        });
+      }
     } else {
-      response.status(status).json({
-        statusCode: status,
-        message: error.message,
-        timestamp: new Date().toISOString(),
-        data: null,
-      });
+      // 그 외 API에 대한 예외 처리
+      if (exception instanceof UnauthorizedException) {
+        response.status(status).json({
+          statusCode: status,
+          timestamp: new Date().toISOString(),
+          message: 'Expired AccessToken',
+          data: null,
+        });
+      } else if (typeof error === 'string') {
+        response.status(status).json({
+          statusCode: status,
+          timestamp: new Date().toISOString(),
+          message: error,
+          data: null,
+        });
+      } else {
+        response.status(status).json({
+          statusCode: status,
+          message: error.message,
+          timestamp: new Date().toISOString(),
+          data: null,
+        });
+      }
     }
   }
 }

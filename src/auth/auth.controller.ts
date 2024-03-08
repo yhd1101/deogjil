@@ -152,7 +152,10 @@ export class AuthController {
     const accessTokenCookie = await this.authService.generateAccessToken(
       req.user.id,
     );
-    // req.res.setHeader('Set-Cookie', accessTokenCookie);
+    // Check if the access token is null or empty (if the refresh token is expired)
+    if (!accessTokenCookie) {
+      throw new UnauthorizedException('Expired RefreshToken');
+    }
     return accessTokenCookie;
   }
 
