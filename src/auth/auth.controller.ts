@@ -76,10 +76,14 @@ export class AuthController {
   @ApiOperation({ summary: '프로필정보', description: '프로필정보 불러오기' })
   @UseGuards(JwtAccessAuthGuard)
   async getUserInfo(@Req() req: RequestWithUserInterface) {
-    const { user } = req;
-    const data = await this.authService.profile(user.id);
-    user.password = undefined;
-    return { data };
+    try {
+      const { user } = req;
+      const data = await this.authService.profile(user.id);
+      user.password = undefined;
+      return { data };
+    } catch (err) {
+      throw new UnauthorizedException('expired accesstoken');
+    }
   }
   @Patch()
   @ApiBearerAuth('access-token')

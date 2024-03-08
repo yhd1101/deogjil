@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -17,7 +18,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
       | string
       | { error: string; statusCode: number; message: string | string[] };
 
-    if (typeof error === 'string') {
+    if (exception instanceof UnauthorizedException) {
+      // UnauthorizedException의 경우 원하는 메시지로 변경
+      response.status(status).json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        message: 'Expired AccessToken',
+        data: null,
+      });
+    } else if (status === 401 && request.url.includes('refresh')) {
+      // RefreshToken 에러 처리
+      response.status(status).json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        message: 'Expired RefreshToken',
+        data: null,
+      });
+    } else if (typeof error === 'string') {
       response.status(status).json({
         statusCode: status,
         timestamp: new Date().toISOString(),
