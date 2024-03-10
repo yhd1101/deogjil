@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,12 +9,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import * as moment from 'moment-timezone';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
+import { CACHE_MANAGER } from '@nestjs/common/cache';
+import { Cache } from 'cache-manager';
+import { Content } from '../contents/entities/content.entity';
+import { Talkcontent } from '../talkcontents/entities/talkcontent.entity';
 
 @Injectable()
 export class UserService {
@@ -22,6 +26,10 @@ export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private readonly configService: ConfigService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectRepository(Content) private contentRepository: Repository<Content>,
+    @InjectRepository(Talkcontent)
+    private talkcontentRepository: Repository<Talkcontent>,
   ) {
     this.awsS3 = new AWS.S3({
       accessKeyId: this.configService.get('AWS_S3_ACCESS_KEY'), // process.env.AWS_S3_ACCESS_KEY
@@ -61,14 +69,83 @@ export class UserService {
   }
 
   async deleteByUser(id: string) {
-    const user = await this.userRepository.delete(id);
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: [
+        'like.content',
+        'likeTalkContent.content',
+        'commetComment.content',
+        'commentTalkComment.content',
+      ],
+    });
     if (!user) {
       throw new NotFoundException('No user');
     }
+    await Promise.all(
+      user.commetComment.map(async (comment) => {
+        // commetComment의 content의 commentCount를 -1 해줍니다.
+        await this.contentRepository
+          .createQueryBuilder()
+          .update(Content)
+          .set({ commentCount: () => '"commentCount" - 1' })
+          .where('id = :contentId', { contentId: comment.content.id })
+          .execute();
+
+        // commetComment
+      }),
+    );
+
+    await Promise.all(
+      user.commentTalkComment.map(async (comment) => {
+        await this.talkcontentRepository
+          .createQueryBuilder()
+          .update(Talkcontent)
+          .set({ commentCount: () => '"commentCount" - 1' })
+          .where('id = :contentId', { contentId: comment.content.id })
+          .execute();
+
+        // commentTalkComment를 삭제합니다.
+      }),
+    ); // 사용자가 좋아요한 항목을 모두 가져와서 각 항목의 likeCount를 -1 해줍니다.
+    await Promise.all(
+      user.like.map(async (like) => {
+        await this.contentRepository
+          .createQueryBuilder()
+          .update(Content)
+          .set({ likeCount: () => '"likeCount" - 1' })
+          .where('id = :contentId', { contentId: like.content.id })
+          .execute();
+      }),
+    );
+    await Promise.all(
+      user.likeTalkContent.map(async (likeTalkContent) => {
+        // talkContent의 likeCount를 -1 해줍니다.
+        await this.talkcontentRepository
+          .createQueryBuilder()
+          .update(Talkcontent)
+          .set({ likeCount: () => '"likeCount" - 1' })
+          .where('id = :contentId', { contentId: likeTalkContent.content.id })
+          .execute();
+      }),
+    );
+
+    // 사용자 엔티티를 삭제합니다.
+    await this.userRepository.delete(id);
 
     return 'deleted';
   }
 
+  async addToBlacklist(token: string) {
+    const cacheKey = `token:${token}`; // 토큰을 기반으로한 캐시 키 생성
+    await this.cacheManager.set(cacheKey, token); // 토큰을 값으로 설정
+  }
+
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    const cacheKey = `token:${token}`; // 토큰을 기반으로한 캐시 키 생성
+    const result = await this.cacheManager.get(cacheKey); // 캐시에서 값을 가져옴
+    console.log(result, 'dddd');
+    return result !== null;
+  }
   async updateUser(
     id: string,
     updateUserDto: UpdateUserDto,

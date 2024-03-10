@@ -165,6 +165,8 @@ export class AuthController {
   @HttpCode(200)
   async logOut(@Req() req: RequestWithUserInterface) {
     await this.userService.removeRefreshToken(req.user.id);
+    const token = req.headers['authorization'].split(' ')[1];
+    await this.authService.logout(token);
     req.res.clearCookie('Refresh');
     return 'logout';
   }

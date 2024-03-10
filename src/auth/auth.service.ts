@@ -38,6 +38,10 @@ export class AuthService {
 
     return userInfo;
   }
+  async logout(token: string) {
+    const logoutToken = await this.userService.addToBlacklist(token);
+    return logoutToken;
+  }
 
   async updateProfile(
     id: string,
