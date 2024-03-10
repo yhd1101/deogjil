@@ -26,11 +26,11 @@ export class JwtAccessAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: TokenPayloadInterface) {
-    const access = this.extractedToken;
-    const isBlacklisted = await this.userService.isTokenBlacklisted(access);
-    if (isBlacklisted) {
-      throw new UnauthorizedException('Token is blacklisted');
-    }
+    // const access = this.extractedToken;
+    // const isBlacklisted = await this.userService.isTokenBlacklisted(access);
+    // if (isBlacklisted) {
+    //   throw new UnauthorizedException('Token is blacklisted');
+    // }
     // 저장된 토큰 사용
     console.log('Using extracted token:', this.extractedToken);
     return this.userService.getUserById(payload.userId);
