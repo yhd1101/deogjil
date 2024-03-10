@@ -14,8 +14,8 @@ import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
-// import { CACHE_MANAGER } from '@nestjs/common/cache';
-// import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/common/cache';
+import { Cache } from 'cache-manager';
 import { Content } from '../contents/entities/content.entity';
 import { Talkcontent } from '../talkcontents/entities/talkcontent.entity';
 
@@ -26,7 +26,7 @@ export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private readonly configService: ConfigService,
-    // @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectRepository(Content) private contentRepository: Repository<Content>,
     @InjectRepository(Talkcontent)
     private talkcontentRepository: Repository<Talkcontent>,
@@ -135,17 +135,17 @@ export class UserService {
     return 'deleted';
   }
 
-  // async addToBlacklist(token: string) {
-  //   const cacheKey = `token:${token}`; // 토큰을 기반으로한 캐시 키 생성
-  //   await this.cacheManager.set(cacheKey, token); // 토큰을 값으로 설정
-  // }
-  //
-  // async isTokenBlacklisted(token: string): Promise<boolean> {
-  //   const cacheKey = `token:${token}`; // 토큰을 기반으로한 캐시 키 생성
-  //   const result = await this.cacheManager.get(cacheKey); // 캐시에서 값을 가져옴
-  //   console.log(result, 'dddd');
-  //   return result !== null;
-  // }
+  async addToBlacklist(token: string) {
+    const cacheKey = `token:${token}`; // 토큰을 기반으로한 캐시 키 생성
+    await this.cacheManager.set(cacheKey, token); // 토큰을 값으로 설정
+  }
+
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    const cacheKey = `token:${token}`; // 토큰을 기반으로한 캐시 키 생성
+    const result = await this.cacheManager.get(cacheKey); // 캐시에서 값을 가져옴
+    console.log(result, 'dddd');
+    return result !== null;
+  }
   async updateUser(
     id: string,
     updateUserDto: UpdateUserDto,
