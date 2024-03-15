@@ -8,7 +8,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from './common/interceptors/transfrom.interceptor';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as moment from 'moment-timezone';
+import passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,7 +18,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:8000',
       'http://localhost:8000/api-docs',
-      'http://duckfull.duckdns.org',
+      'https://www.dukpool.co.kr',
       'http://localhost:3000',
     ],
     credentials: true,
@@ -36,7 +36,6 @@ async function bootstrap() {
   app.useStaticAssets(path.join(__dirname, './common', 'uploads'), {
     prefix: '/media',
   });
-  console.log('git testsssss');
   await app.listen(8000);
 }
 bootstrap();

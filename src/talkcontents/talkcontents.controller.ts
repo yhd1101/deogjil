@@ -9,7 +9,6 @@ import {
   UseGuards,
   Req,
   Query,
-  Put,
   NotFoundException,
   UseInterceptors,
   UploadedFiles,
@@ -30,9 +29,7 @@ import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';
 import { PageDto } from '../common/dtos/page.dto';
 import { Talkcontent } from './entities/talkcontent.entity';
-import { CreateContentDto } from '../contents/dto/create-content.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from '../common/utils/multer.options';
 import { JwtOptionalAuthGuard } from '../auth/guards/jwtOptional-auth.guard';
 
 @ApiTags('talkContents')
@@ -102,9 +99,10 @@ export class TalkcontentsController {
     @Req() req: RequestWithUserInterface,
   ) {
     try {
+      const user = req.user;
       const content = await this.talkcontentsService.talkContentGetById(
         id,
-        req.user,
+        user,
       );
       return content;
     } catch (err) {

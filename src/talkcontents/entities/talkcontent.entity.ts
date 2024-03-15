@@ -1,7 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CommonEntity } from '../../common/entities/common.entity';
 import { User } from '../../user/entities/user.entity';
-import { Like } from '../../likes/entities/like.entity';
 import { CommentTalkContent } from '../../comment-talk-content/entities/comment-talk-content.entity';
 import { LikeTalkContent } from '../../like-talk-content/entities/like-talk-content.entity';
 
