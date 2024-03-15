@@ -29,7 +29,6 @@ export class CommentContentService {
       writer: user,
     });
 
-    console.log(newComment);
     const contentId = createCommentContentDto.content;
 
     await this.commentContentRepository.save(newComment);

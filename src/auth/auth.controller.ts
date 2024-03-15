@@ -135,16 +135,6 @@ export class AuthController {
     return { accessToken, user };
   }
 
-  // @UseGuards(JwtRefreshAuthGuard)
-  // @Post('refresh')
-  // async refreshToken(@Req() req: RequestWithUserInterface) {
-  //   const user = req.user;
-  //   // 새로운 액세스 토큰 발급
-  //   const accessToken = await this.authService.generateAccessToken(user.id);
-  //   console.log(accessToken);
-  //   return accessToken;
-  // }
-
   @Get('/refresh')
   @UseGuards(JwtRefreshAuthGuard)
   async refresh(@Req() req: RequestWithUserInterface) {

@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -325,7 +324,6 @@ export class ContentsService {
         content.img.map(async (imageUrl) => {
           try {
             const key = this.extractS3KeyFromUrl(imageUrl);
-            console.log(key);
             await this.deleteS3Object(key);
           } catch (error) {
             console.error('Error deleting S3 object:', error);

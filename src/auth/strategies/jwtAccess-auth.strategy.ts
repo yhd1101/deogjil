@@ -31,8 +31,6 @@ export class JwtAccessAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (isBlacklisted) {
       throw new UnauthorizedException('Token is blacklisted');
     }
-    // 저장된 토큰 사용
-    console.log('Using extracted token:', this.extractedToken);
     return this.userService.getUserById(payload.userId);
   }
 }

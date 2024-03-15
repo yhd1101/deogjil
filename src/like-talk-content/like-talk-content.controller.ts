@@ -37,7 +37,6 @@ export class LikeTalkContentController {
     @Req() req: RequestWithUserInterface,
     @Body() createLikeTalkContentDto: CreateLikeTalkContentDto,
   ) {
-    console.log(createLikeTalkContentDto);
     const likeCount = await this.likeTalkContentService.createLike(
       req.user,
       createLikeTalkContentDto,

@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -11,8 +6,6 @@ import { TokenPayloadInterface } from './tokenPayload.interface';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { Provider } from '../user/entities/provider.enum';
-import * as qs from 'qs';
-import axios from 'axios';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Injectable()
@@ -29,7 +22,6 @@ export class AuthService {
       provider: Provider.LOCAL,
     });
     user.password = undefined;
-    console.log(user);
 
     return user;
   }

@@ -55,7 +55,6 @@ export class UserService {
       where: { id },
       relations: ['content', 'talkContent'],
     });
-    console.log(profile);
     return profile;
   }
 
@@ -143,7 +142,6 @@ export class UserService {
   async isTokenBlacklisted(token: string): Promise<boolean> {
     const cacheKey = `token:${token}`; // 토큰을 기반으로한 캐시 키 생성
     const result = await this.cacheManager.get(cacheKey); // 캐시에서 값을 가져옴
-    console.log(result, 'dddd');
     return result !== null;
   }
   async updateUser(
@@ -161,7 +159,6 @@ export class UserService {
     const isNicknameDuplicate = await this.checkNicknameDuplicate(
       updateUserDto.nickname,
     );
-    console.log(isNicknameDuplicate);
     if (isNicknameDuplicate) {
       throw new BadRequestException(
         'Nickname is already in use. Please choose a different one.',

@@ -38,16 +38,12 @@ export class LikeTalkContentService {
       })
       .getCount();
 
-    console.log(like);
     //
     if (like > 0) {
       throw new ConflictException('already liked');
     }
 
     const contentId = createLikeTalkContentDto.content;
-    // //
-    // const id = createLikeTalkContentDto.talkcontent.id;
-    // console.log('id:', id);
     await this.likeTalkContentRepository.save(newLike);
 
     await this.talkcontentRepository
