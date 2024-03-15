@@ -99,9 +99,10 @@ export class TalkcontentsController {
     @Req() req: RequestWithUserInterface,
   ) {
     try {
+      const user = req.user;
       const content = await this.talkcontentsService.talkContentGetById(
         id,
-        req.user,
+        user,
       );
       return content;
     } catch (err) {

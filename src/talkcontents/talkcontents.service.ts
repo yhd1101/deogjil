@@ -132,6 +132,7 @@ export class TalkcontentsService {
       .leftJoinAndSelect('talkContent.comment', 'comment')
       .leftJoinAndSelect('comment.writer', 'commentWriter')
       .where('talkContent.id= :id', { id })
+      .orderBy('comment.createdAt', 'ASC')
       .getOne();
     if (user) {
       const likes = await this.likeTalkContentRepository.find({

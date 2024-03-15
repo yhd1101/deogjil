@@ -209,7 +209,7 @@ export class ContentsService {
       .leftJoinAndSelect('content.comment', 'comment')
       .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
       .where('content.id= :id', { id })
-      .orderBy('comment.createdAt', 'DESC')
+      .orderBy('comment.createdAt', 'ASC')
       .getOne();
     if (user) {
       const likes = await this.likeRepository.find({
