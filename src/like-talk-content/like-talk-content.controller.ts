@@ -44,7 +44,7 @@ export class LikeTalkContentController {
     return likeCount;
   }
 
-  @Delete(':id')
+  @Delete(':contentId')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({
