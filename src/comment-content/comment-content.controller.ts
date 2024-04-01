@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
@@ -8,7 +7,6 @@ import {
   Delete,
   UseGuards,
   Req,
-  Put,
 } from '@nestjs/common';
 import { CommentContentService } from './comment-content.service';
 import { CreateCommentContentDto } from './dto/create-comment-content.dto';
