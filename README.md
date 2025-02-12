@@ -1,73 +1,40 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+<div align="center">
+<a href="https://www.dukpool.co.kr">
+<img width="110px" src="https://i.imgur.com/svmlL8p.png" alt="덕풀 로고"/>
+</a>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+[![](https://img.shields.io/badge/-Dukpool-important?style=flat&logo=airplayvideo&labelColor=%23000000&color=%23515ce6)](https://www.dukpool.co.kr/)
+[![](https://img.shields.io/badge/-v.1.1.2-critical?style=flat&logo=github&label=release&labelColor=%23000000&color=%23ffffff)
+](https://github.com/f-lab-edu/dukpool/releases)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# 덕풀
 
-## Description
+### 🎮 나만의 덕질 생활을 자랑해봐, 덕풀 🎮
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+</div>
 
-## Installation
+<br>
 
-```bash
-$ npm install
-```
+## 🗣️ About Dukpool
 
-## Running the app
+당신만의 취향을 공유하고 소통할 수 있는 특별한 공간, 바로 [덕풀]입니다!
 
-```bash
-# development
-$ npm run start
+[덕풀]은 다양한 취향과 관심사를 가진 사람들을 위한 플랫폼으로, 각자의 독특한 취향을 자유롭게 표현하고 공유할 수 있습니다. 무엇이든 좋습니다. 애니메이션, 영화, 음악, 책, 요리, 여행, 패션, 미술, 게임, 스포츠, 그리고 더 많은 것까지!
 
-# watch mode
-$ npm run start:dev
+취향에 따라 태그를 포함하여 게시물을 작성하고, 다른 이용자들과 이야기를 나눌 수 있습니다. 또한, 다른 사람들의 취향을 알아보고, 공감하며 새로운 취향을 발견할 수 있는 기회를 만들어 줍니다.
 
-# production mode
-$ npm run start:prod
-```
+<br>
 
-## Test
+## 🛠️ 기술스택
 
-```bash
-# unit tests
-$ npm run test
+![](https://i.imgur.com/DFU1tPs.png)
 
-# e2e tests
-$ npm run test:e2e
+<br>
 
-# test coverage
-$ npm run test:cov
-```
+## 🌱 아키텍처
 
-## Support
+![](https://i.imgur.com/1cbpQBW.png)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+<br>
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+## 📖 기술적인 경험을 기록해봤어요
