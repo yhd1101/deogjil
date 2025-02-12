@@ -38,9 +38,3 @@
 <br>
 
 ## 📖 기술적인 경험을 기록해봤어요
-
-[🔔 Promise를 활용한 전역 모달 관리](https://gunu-dev.tistory.com/entry/promise%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%9C-%EC%A0%84%EC%97%AD-%EB%AA%A8%EB%8B%AC-%EA%B4%80%EB%A6%AC-feat-contextAPI)
-
-[🔐 애플리케이션 유저 로그인 상태 및 인증 로직 관리](https://gunu-dev.tistory.com/entry/%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98-%EC%9C%A0%EC%A0%80-%EB%A1%9C%EA%B7%B8%EC%9D%B8-%EC%83%81%ED%83%9C-%EB%B0%8F-%EC%9D%B8%EC%A6%9D-%EB%A1%9C%EC%A7%81-%EA%B4%80%EB%A6%AC-feat-Jotai)
-
-[⛔️ 애플리케이션 에러처리 중앙화](https://gunu-dev.tistory.com/entry/%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98-%EC%97%90%EB%9F%AC%EC%B2%98%EB%A6%AC-%EC%A4%91%EC%95%99%ED%99%94)
