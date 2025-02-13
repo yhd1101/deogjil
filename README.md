@@ -25,7 +25,7 @@
 
 <br>
 
-## 🛠️ 기술스택
+## 🛠️ 기술 스택 (Tech Stack)
 
 [![](https://img.shields.io/badge/-TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![](https://img.shields.io/badge/-NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)](https://nestjs.com/)
@@ -35,7 +35,7 @@
 [![](https://img.shields.io/badge/-Redis-DC382D?style=flat&logo=redis&logoColor=white)](https://redis.io/)
 [![](https://img.shields.io/badge/-AWS_S3-569A31?style=flat&logo=amazonaws&logoColor=white)](https://aws.amazon.com/s3/)
 [![](https://img.shields.io/badge/-AWS_Lightsail-232F3E?style=flat&logo=amazonaws&logoColor=white)](https://aws.amazon.com/lightsail/)
-
+[![](https://img.shields.io/badge/-GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white)](https://github.com/features/actions)
 
 
 <br>
