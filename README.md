@@ -33,6 +33,9 @@
 [![](https://img.shields.io/badge/-PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![](https://img.shields.io/badge/-Nginx-009639?style=flat&logo=nginx&logoColor=white)](https://www.nginx.com/)
 [![](https://img.shields.io/badge/-Redis-DC382D?style=flat&logo=redis&logoColor=white)](https://redis.io/)
+[![](https://img.shields.io/badge/-AWS_S3-569A31?style=flat&logo=amazonaws&logoColor=white)](https://aws.amazon.com/s3/)
+[![](https://img.shields.io/badge/-AWS_Lightsail-232F3E?style=flat&logo=amazonaws&logoColor=white)](https://aws.amazon.com/lightsail/)
+
 
 
 <br>
