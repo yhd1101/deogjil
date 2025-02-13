@@ -25,7 +25,7 @@
 
 <br>
 
-## 🛠️ 기술 스택 (Tech Stack)
+## 🛠️ 기술 스택 
 
 [![](https://img.shields.io/badge/-TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![](https://img.shields.io/badge/-NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)](https://nestjs.com/)
