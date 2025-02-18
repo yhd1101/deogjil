@@ -1,9 +1,7 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
@@ -39,7 +37,6 @@ export class LikeTalkContentController {
     @Req() req: RequestWithUserInterface,
     @Body() createLikeTalkContentDto: CreateLikeTalkContentDto,
   ) {
-    console.log(createLikeTalkContentDto);
     const likeCount = await this.likeTalkContentService.createLike(
       req.user,
       createLikeTalkContentDto,
@@ -47,7 +44,7 @@ export class LikeTalkContentController {
     return likeCount;
   }
 
-  @Delete(':id')
+  @Delete(':contentId')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({

@@ -17,7 +17,6 @@ import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
-import { Content } from '../contents/entities/content.entity';
 import { LikeTalkContent } from '../like-talk-content/entities/like-talk-content.entity';
 
 @Injectable()
@@ -78,19 +77,15 @@ export class TalkcontentsService {
     const queryBuilder =
       await this.talkcontentRepository.createQueryBuilder('talkContents');
     queryBuilder.leftJoinAndSelect('talkContents.writer', 'writer');
+
+    if (searchQuery) {
+      queryBuilder.where('talkContents.title LIKE :searchQuery', {
+        searchQuery: `%${searchQuery}%`,
+      });
+    }
     if (tag) {
       queryBuilder.andWhere(':tag = ANY(talkContents.tag)', {
         tag,
-      });
-    }
-
-    if (searchQuery) {
-      queryBuilder.where(
-        'talkContents.title LIKE :searchQuery OR talkContents.desc LIKE :searchQuery OR :searchQuery = ANY(talkContents.tag)',
-        { searchQuery: `%${searchQuery}%` },
-      );
-      queryBuilder.andWhere(':searchQuery = ANY(talkContents.tag)', {
-        searchQuery,
       });
     }
 
@@ -137,6 +132,7 @@ export class TalkcontentsService {
       .leftJoinAndSelect('talkContent.comment', 'comment')
       .leftJoinAndSelect('comment.writer', 'commentWriter')
       .where('talkContent.id= :id', { id })
+      .orderBy('comment.createdAt', 'ASC')
       .getOne();
     if (user) {
       const likes = await this.likeTalkContentRepository.find({
@@ -237,7 +233,6 @@ export class TalkcontentsService {
       content.img.map(async (imageUrl) => {
         try {
           const key = this.extractS3KeyFromUrl(imageUrl);
-          console.log(key);
           await this.deleteS3Object(key);
         } catch (error) {
           console.error('Error deleting S3 object:', error);
