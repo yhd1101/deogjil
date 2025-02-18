@@ -41,7 +41,8 @@
 <br>
 
 ## 🌱 아키텍처
-<img width="825" alt="image" src="https://github.com/user-attachments/assets/df0ae4f2-c205-426d-90bf-af54d7286483" />
+<img width="665" alt="image" src="https://github.com/user-attachments/assets/7a6609e0-f8fd-4a95-9ae0-da056c9ebe31" />
+
 
 <br>
 
