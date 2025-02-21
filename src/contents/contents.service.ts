@@ -205,54 +205,54 @@ export class ContentsService {
     return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
 
-  async contentGetById(id: string, user: any) {
-    try {
-      const content = await this.contentRepository
-        .createQueryBuilder('content')
-        .leftJoinAndSelect('content.writer', 'writer')
-        .leftJoinAndSelect('content.comment', 'comment')
-        .leftJoinAndSelect('comment.writer', 'commentWriter')
-        .where('content.id = :id', { id })
-        .orderBy('comment.createdAt', 'ASC')
-        .getOne();
-
-      if (!content) {
-        throw new NotFoundException('content not found');
-      }
-
-      // Redis에서 최신 likeCount를 조회
-      const client = this.cacheManager.store.getClient() as IORedis.Redis;
-      const redisKey = `like:content:${content.id}`;
-      const redisCount = await client.get(redisKey);
-      content.likeCount = redisCount !== null ? parseInt(redisCount, 10) : 0;
-      // 사용자에 따른 추가 로직 처리 (예: isLiked 설정)
-
-      return { content };
-    } catch (error) {
-      // 에러 핸들링
-      throw error;
-    }
-  }
-
-  // async contentGetById(id: string, user: User) {
-  //   const content = await this.contentRepository
-  //     .createQueryBuilder('content')
-  //     .leftJoinAndSelect('content.writer', 'writer')
-  //     .leftJoinAndSelect('content.comment', 'comment')
-  //     .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
-  //     .where('content.id= :id', { id })
-  //     .orderBy('comment.createdAt', 'ASC')
-  //     .getOne();
-  //   if (user) {
-  //     const likes = await this.likeRepository.find({
-  //       where: { user: { id: user.id } },
-  //       relations: ['content'],
-  //     });
-  //     content.isLiked = likes.some((like) => like.content.id === content.id);
-  //   }
+  // async contentGetById(id: string, user: any) {
+  //   try {
+  //     const content = await this.contentRepository
+  //       .createQueryBuilder('content')
+  //       .leftJoinAndSelect('content.writer', 'writer')
+  //       .leftJoinAndSelect('content.comment', 'comment')
+  //       .leftJoinAndSelect('comment.writer', 'commentWriter')
+  //       .where('content.id = :id', { id })
+  //       .orderBy('comment.createdAt', 'ASC')
+  //       .getOne();
   //
-  //   return { content };
+  //     if (!content) {
+  //       throw new NotFoundException('content not found');
+  //     }
+  //
+  //     // Redis에서 최신 likeCount 조회
+  //     const client = this.cacheManager.store.getClient() as IORedis.Redis;
+  //     const redisKey = `like:content:${content.id}`;
+  //     const redisCount = await client.get(redisKey);
+  //     const parsedCount = parseInt(redisCount || '0', 10);
+  //     content.likeCount = !isNaN(parsedCount) ? parsedCount : 0;
+  //     console.log('Final likeCount set on content:', content.likeCount);
+  //
+  //     return { content };
+  //   } catch (error) {
+  //     throw error;
+  //   }
   // }
+
+  async contentGetById(id: string, user: User) {
+    const content = await this.contentRepository
+      .createQueryBuilder('content')
+      .leftJoinAndSelect('content.writer', 'writer')
+      .leftJoinAndSelect('content.comment', 'comment')
+      .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
+      .where('content.id= :id', { id })
+      .orderBy('comment.createdAt', 'ASC')
+      .getOne();
+    if (user) {
+      const likes = await this.likeRepository.find({
+        where: { user: { id: user.id } },
+        relations: ['content'],
+      });
+      content.isLiked = likes.some((like) => like.content.id === content.id);
+    }
+
+    return { content };
+  }
 
   async contentUpdateById(
     id: string,
