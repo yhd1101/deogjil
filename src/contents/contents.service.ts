@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,9 +19,10 @@ import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
 import { Like } from '../likes/entities/like.entity';
+import { CACHE_MANAGER } from '@nestjs/common/cache';
 // import { CACHE_MANAGER } from '@nestjs/common/cache';
-// import { Cache } from 'cache-manager';
-
+import { Cache } from 'cache-manager';
+import * as IORedis from 'ioredis';
 @Injectable()
 export class ContentsService {
   private readonly awsS3: AWS.S3;
@@ -28,7 +30,7 @@ export class ContentsService {
   constructor(
     @InjectRepository(Content) private contentRepository: Repository<Content>,
     @InjectRepository(Like) private likeRepository: Repository<Like>,
-    // @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly configService: ConfigService,
   ) {
     this.awsS3 = new AWS.S3({
@@ -36,6 +38,7 @@ export class ContentsService {
       secretAccessKey: this.configService.get('AWS_S3_SECRET_KEY'),
       region: this.configService.get('AWS_S3_REGION'),
     });
+
     this.S3_BUCKET_NAME = this.configService.get('AWS_S3_BUCKET_NAME');
   }
 
@@ -121,21 +124,21 @@ export class ContentsService {
     return `https://${this.S3_BUCKET_NAME}.s3.amazonaws.com/${objectKey}`;
   }
 
-  async uploadImg(files: Express.Multer.File[]) {
-    const imageUrls = [];
-
-    if (files) {
-      const fileList = Object.values(files);
-
-      // 각 파일에 대해 이미지 업로드 로직을 수행
-      for (const file of fileList) {
-        const fileName = `content/${file.filename}`;
-        imageUrls.push(`http://localhost:8000//${fileName}`);
-      }
-    }
-
-    return imageUrls;
-  }
+  // async uploadImg(files: Express.Multer.File[]) {
+  //   const imageUrls = [];
+  //
+  //   if (files) {
+  //     const fileList = Object.values(files);
+  //
+  //     // 각 파일에 대해 이미지 업로드 로직을 수행
+  //     for (const file of fileList) {
+  //       const fileName = `content/${file.filename}`;
+  //       imageUrls.push(`http://localhost:8000//${fileName}`);
+  //     }
+  //   }
+  //
+  //   return imageUrls;
+  // }
   async contentGetAll(
     pageOptionsDto: PageOptionsDto,
     searchQuery?: string,
@@ -202,25 +205,57 @@ export class ContentsService {
     return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
 
-  async contentGetById(id: string, user: User) {
-    const content = await this.contentRepository
-      .createQueryBuilder('content')
-      .leftJoinAndSelect('content.writer', 'writer')
-      .leftJoinAndSelect('content.comment', 'comment')
-      .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
-      .where('content.id= :id', { id })
-      .orderBy('comment.createdAt', 'ASC')
-      .getOne();
-    if (user) {
-      const likes = await this.likeRepository.find({
-        where: { user: { id: user.id } },
-        relations: ['content'],
-      });
-      content.isLiked = likes.some((like) => like.content.id === content.id);
-    }
+  async contentGetById(id: string, user: any) {
+    try {
+      const content = await this.contentRepository
+        .createQueryBuilder('content')
+        .leftJoinAndSelect('content.writer', 'writer')
+        .leftJoinAndSelect('content.comment', 'comment')
+        .leftJoinAndSelect('comment.writer', 'commentWriter')
+        .where('content.id = :id', { id })
+        .orderBy('comment.createdAt', 'ASC')
+        .getOne();
 
-    return { content };
+      if (!content) {
+        throw new NotFoundException('content not found');
+      }
+
+      // Redis에서 최신 likeCount를 조회
+      const client = this.cacheManager.store.getClient() as IORedis.Redis;
+      const redisKey = `like:content:${content.id}`;
+      const redisCount = await client.get(redisKey);
+      content.likeCount = redisCount
+        ? parseInt(redisCount, 10)
+        : content.likeCount;
+
+      // 사용자에 따른 추가 로직 처리 (예: isLiked 설정)
+
+      return { content };
+    } catch (error) {
+      // 에러 핸들링
+      throw error;
+    }
   }
+
+  // async contentGetById(id: string, user: User) {
+  //   const content = await this.contentRepository
+  //     .createQueryBuilder('content')
+  //     .leftJoinAndSelect('content.writer', 'writer')
+  //     .leftJoinAndSelect('content.comment', 'comment')
+  //     .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
+  //     .where('content.id= :id', { id })
+  //     .orderBy('comment.createdAt', 'ASC')
+  //     .getOne();
+  //   if (user) {
+  //     const likes = await this.likeRepository.find({
+  //       where: { user: { id: user.id } },
+  //       relations: ['content'],
+  //     });
+  //     content.isLiked = likes.some((like) => like.content.id === content.id);
+  //   }
+  //
+  //   return { content };
+  // }
 
   async contentUpdateById(
     id: string,
@@ -324,6 +359,7 @@ export class ContentsService {
         content.img.map(async (imageUrl) => {
           try {
             const key = this.extractS3KeyFromUrl(imageUrl);
+            console.log('key:', key);
             await this.deleteS3Object(key);
           } catch (error) {
             console.error('Error deleting S3 object:', error);

@@ -32,7 +32,7 @@ export class UserService {
     private talkcontentRepository: Repository<Talkcontent>,
   ) {
     this.awsS3 = new AWS.S3({
-      accessKeyId: this.configService.get('AWS_S3_ACCESS_KEY'), // process.env.AWS_S3_ACCESS_KEY
+      accessKeyId: this.configService.get('AWS_S3_ACCESS_KEY'),
       secretAccessKey: this.configService.get('AWS_S3_SECRET_KEY'),
       region: this.configService.get('AWS_S3_REGION'),
     });
