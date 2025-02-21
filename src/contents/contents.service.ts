@@ -224,10 +224,7 @@ export class ContentsService {
       const client = this.cacheManager.store.getClient() as IORedis.Redis;
       const redisKey = `like:content:${content.id}`;
       const redisCount = await client.get(redisKey);
-      content.likeCount = redisCount
-        ? parseInt(redisCount, 10)
-        : content.likeCount;
-
+      content.likeCount = redisCount !== null ? parseInt(redisCount, 10) : 0;
       // 사용자에 따른 추가 로직 처리 (예: isLiked 설정)
 
       return { content };
