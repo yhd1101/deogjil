@@ -35,7 +35,6 @@ export class KakaoAuthStrategy extends PassportStrategy(
       provider,
       profileImg: profile_image,
     };
-    console.log(userInput);
     try {
       const user = await this.userService.getUserByEmail(email);
       if (user.provider !== provider) {

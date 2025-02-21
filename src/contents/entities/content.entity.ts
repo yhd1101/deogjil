@@ -1,13 +1,5 @@
 import { CommonEntity } from '../../common/entities/common.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-  BeforeInsert,
-  BeforeUpdate,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Like } from '../../likes/entities/like.entity';
 import { CommentContent } from '../../comment-content/entities/comment-content.entity';

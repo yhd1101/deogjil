@@ -16,5 +16,5 @@ export class LocalAuthStrategy extends PassportStrategy(Strategy) {
   //검증되는 함수
   async validate(email: string, password: string): Promise<User> {
     return this.authService.Login({ email, password });
-  } //User로 리턴
+  }
 }

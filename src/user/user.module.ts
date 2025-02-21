@@ -6,13 +6,15 @@ import { User } from './entities/user.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as multer from 'multer';
+import { Content } from '../contents/entities/content.entity';
+import { Talkcontent } from '../talkcontents/entities/talkcontent.entity';
 @Module({
   imports: [
     MulterModule.register({
       dest: './upload',
       storage: multer.memoryStorage(),
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Content, Talkcontent]),
     ConfigModule.forRoot(),
   ],
   controllers: [UserController],
