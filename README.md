@@ -47,3 +47,4 @@
 <br>
 
 ## 📖 기술적인 경험을 기록해봤어요
+https://velog.io/@yhd1101/%ED%8C%8C%EC%9D%BC%EC%B2%98%EB%A6%AC%EB%A5%BC-%EB%A1%9C%EC%BB%AC%EB%A1%9C-%EB%A7%90%EA%B3%A0-S3%EB%A1%9C-%EC%A0%80%EC%9E%A5%ED%95%98%EA%B8%B0
