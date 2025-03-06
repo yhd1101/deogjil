@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,7 +19,10 @@ import * as AWS from 'aws-sdk';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import * as path from 'path';
 import { Like } from '../likes/entities/like.entity';
-
+import { CACHE_MANAGER } from '@nestjs/common/cache';
+// import { CACHE_MANAGER } from '@nestjs/common/cache';
+import { Cache } from 'cache-manager';
+import * as IORedis from 'ioredis';
 @Injectable()
 export class ContentsService {
   private readonly awsS3: AWS.S3;
@@ -26,6 +30,7 @@ export class ContentsService {
   constructor(
     @InjectRepository(Content) private contentRepository: Repository<Content>,
     @InjectRepository(Like) private likeRepository: Repository<Like>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly configService: ConfigService,
   ) {
     this.awsS3 = new AWS.S3({
@@ -33,6 +38,7 @@ export class ContentsService {
       secretAccessKey: this.configService.get('AWS_S3_SECRET_KEY'),
       region: this.configService.get('AWS_S3_REGION'),
     });
+
     this.S3_BUCKET_NAME = this.configService.get('AWS_S3_BUCKET_NAME');
   }
 
@@ -59,11 +65,11 @@ export class ContentsService {
 
       // 콘텐츠 저장
       await this.contentRepository.save(newContent);
-
+      // await this.cacheManager.del('contents');
       return newContent;
     } catch (error) {
       // 오류 처리
-      console.error('Error creating content:', error);
+
       throw new BadRequestException('Failed to create content');
     }
   }
@@ -118,98 +124,20 @@ export class ContentsService {
     return `https://${this.S3_BUCKET_NAME}.s3.amazonaws.com/${objectKey}`;
   }
 
-  async uploadImg(files: Express.Multer.File[]) {
-    const imageUrls = [];
-
-    // files가 undefined나 null인 경우 처리
-    if (files) {
-      // Object.values를 사용하여 객체를 배열로 변환
-      const fileList = Object.values(files);
-
-      // 각 파일에 대해 이미지 업로드 로직을 수행
-      for (const file of fileList) {
-        const fileName = `content/${file.filename}`;
-        // 파일을 저장하거나 다른 로직 수행 가능
-        // 여기에서는 이미지 URL을 생성하여 저장
-        imageUrls.push(`http://localhost:8000//${fileName}`);
-      }
-    }
-    console.log('ddd12', imageUrls);
-
-    return imageUrls;
-  }
-
-  // async contentGetAll(
-  //   pageOptionsDto: PageOptionsDto,
-  //   searchQuery?: string,
-  //   sortType?: string,
-  //   tag?: string,
-  //   user?: { id: string },
-  // ): Promise<PageDto<Content>> {
-  //   const queryBuilder =
-  //     await this.contentRepository.createQueryBuilder('contents');
-  //   queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
-  //   if (tag) {
-  //     queryBuilder.andWhere(':tag = ANY(contents.tag)', {
-  //       tag,
-  //     });
-  //   }
-  //   if (searchQuery) {
-  //     console.log(searchQuery);
-  //     queryBuilder.where(
-  //       'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery OR :searchQuery = ANY(contents.tag)',
-  //       { searchQuery: `%${searchQuery}%` },
-  //     );
-  //     queryBuilder.andWhere(':searchQuery = ANY(contents.tag)', {
-  //       searchQuery,
-  //     });
+  // async uploadImg(files: Express.Multer.File[]) {
+  //   const imageUrls = [];
+  //
+  //   if (files) {
+  //     const fileList = Object.values(files);
+  //
+  //     // 각 파일에 대해 이미지 업로드 로직을 수행
+  //     for (const file of fileList) {
+  //       const fileName = `content/${file.filename}`;
+  //       imageUrls.push(`http://localhost:8000//${fileName}`);
+  //     }
   //   }
   //
-  //   switch (sortType) {
-  //     case 'like':
-  //       queryBuilder.addOrderBy('contents.likeCount', 'DESC');
-  //       break;
-  //     case 'commentcount':
-  //       queryBuilder.addOrderBy('contents.commentCount', 'DESC');
-  //       break;
-  //     default:
-  //       queryBuilder.addOrderBy('contents.createdAt', pageOptionsDto.order);
-  //       break;
-  //   }
-  //   let contentWithCommentCount: Content[] = [];
-  //   let itemCount = 0;
-  //
-  //   if (user) {
-  //     // 좋아요 정보 가져오기
-  //     const likes = await this.likeRepository.find({
-  //       where: { user: { id: user.id } },
-  //       relations: ['content'],
-  //     });
-  //
-  //     // 좋아요 정보 매핑
-  //     const contentsWithLikes = likes.map((like) => {
-  //       const content = like.content;
-  //       content.isLiked = true;
-  //       return content;
-  //     });
-  //
-  //     itemCount = contentsWithLikes.length;
-  //
-  //     // 페이징 적용
-  //     contentWithCommentCount = contentsWithLikes.slice(
-  //       pageOptionsDto.skip,
-  //       pageOptionsDto.skip + pageOptionsDto.take,
-  //     );
-  //   } else {
-  //     // 사용자가 없는 경우
-  //     [contentWithCommentCount, itemCount] = await queryBuilder
-  //       .skip(pageOptionsDto.skip)
-  //       .take(pageOptionsDto.take)
-  //       .getManyAndCount();
-  //   }
-  //
-  //   const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
-  //   return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
+  //   return imageUrls;
   // }
   async contentGetAll(
     pageOptionsDto: PageOptionsDto,
@@ -221,19 +149,15 @@ export class ContentsService {
     const queryBuilder =
       await this.contentRepository.createQueryBuilder('contents');
     queryBuilder.leftJoinAndSelect('contents.writer', 'writer');
+
+    if (searchQuery) {
+      queryBuilder.where('contents.title LIKE :searchQuery', {
+        searchQuery: `%${searchQuery}%`,
+      });
+    }
     if (tag) {
       queryBuilder.andWhere(':tag = ANY(contents.tag)', {
         tag,
-      });
-    }
-    if (searchQuery) {
-      console.log(searchQuery);
-      queryBuilder.where(
-        'contents.title LIKE :searchQuery OR contents.desc LIKE :searchQuery OR :searchQuery = ANY(contents.tag)',
-        { searchQuery: `%${searchQuery}%` },
-      );
-      queryBuilder.andWhere(':searchQuery = ANY(contents.tag)', {
-        searchQuery,
       });
     }
 
@@ -277,8 +201,38 @@ export class ContentsService {
     }
 
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
     return new PageDto<Content>(contentWithCommentCount, pageMetaDto);
   }
+
+  // async contentGetById(id: string, user: any) {
+  //   try {
+  //     const content = await this.contentRepository
+  //       .createQueryBuilder('content')
+  //       .leftJoinAndSelect('content.writer', 'writer')
+  //       .leftJoinAndSelect('content.comment', 'comment')
+  //       .leftJoinAndSelect('comment.writer', 'commentWriter')
+  //       .where('content.id = :id', { id })
+  //       .orderBy('comment.createdAt', 'ASC')
+  //       .getOne();
+  //
+  //     if (!content) {
+  //       throw new NotFoundException('content not found');
+  //     }
+  //
+  //     // Redis에서 최신 likeCount 조회
+  //     const client = this.cacheManager.store.getClient() as IORedis.Redis;
+  //     const redisKey = `like:content:${content.id}`;
+  //     const redisCount = await client.get(redisKey);
+  //     const parsedCount = parseInt(redisCount || '0', 10);
+  //     content.likeCount = !isNaN(parsedCount) ? parsedCount : 0;
+  //     console.log('Final likeCount set on content:', content.likeCount);
+  //
+  //     return { content };
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   async contentGetById(id: string, user: User) {
     const content = await this.contentRepository
@@ -287,7 +241,7 @@ export class ContentsService {
       .leftJoinAndSelect('content.comment', 'comment')
       .leftJoinAndSelect('comment.writer', 'commentWriter') // Add this line to join comment.writer
       .where('content.id= :id', { id })
-      .orderBy('comment.createdAt', 'DESC')
+      .orderBy('comment.createdAt', 'ASC')
       .getOne();
     if (user) {
       const likes = await this.likeRepository.find({
@@ -402,7 +356,7 @@ export class ContentsService {
         content.img.map(async (imageUrl) => {
           try {
             const key = this.extractS3KeyFromUrl(imageUrl);
-            console.log(key);
+            console.log('key:', key);
             await this.deleteS3Object(key);
           } catch (error) {
             console.error('Error deleting S3 object:', error);
