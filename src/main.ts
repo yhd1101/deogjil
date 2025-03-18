@@ -8,7 +8,8 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from './common/interceptors/transfrom.interceptor';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as moment from 'moment-timezone';
+import passport from 'passport';
+import * as expressBasicAuth from 'express-basic-auth';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,7 +19,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:8000',
       'http://localhost:8000/api-docs',
-      'http://duckfull.duckdns.org',
+      'https://www.dukpool.co.kr',
       'http://localhost:3000',
     ],
     credentials: true,
@@ -28,6 +29,16 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalPipes(new ValidationPipe({ transform: true })); //적용을하겠다
+  app.use(
+    //이 부분 추가
+    ['/api-docs'], // docs(swagger end point)에 진입시
+    expressBasicAuth({
+      challenge: true,
+      users: {
+        [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD, // 지정된 ID/비밀번호
+      },
+    }),
+  );
 
   const config = new BaseAPIDocument().initializeOptions();
   const documet = SwaggerModule.createDocument(app, config);
@@ -36,7 +47,6 @@ async function bootstrap() {
   app.useStaticAssets(path.join(__dirname, './common', 'uploads'), {
     prefix: '/media',
   });
-  console.log('git testsssss');
   await app.listen(8000);
 }
 bootstrap();

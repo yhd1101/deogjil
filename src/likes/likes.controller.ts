@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { CreateLikeDto } from './dto/create-like.dto';
-import { UpdateLikeDto } from './dto/update-like.dto';
 import { JwtAccessAuthGuard } from '../auth/guards/jwtAccess-auth.guard';
 import { RequestWithUserInterface } from '../auth/requestWithUser.interface';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -45,10 +44,9 @@ export class LikesController {
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({
     summary: '좋아요 취소',
-    description: ' 좋아요취소 like id 입력',
+    description: '좋아요 취소 like id 입력',
   })
-  async likeDelete(@Param('contentId') contentId: string) {
-    console.log('ddd', contentId);
+  async likeDelete(@Param('id') contentId: string) {
     await this.likesService.deleteLike(contentId);
   }
 }

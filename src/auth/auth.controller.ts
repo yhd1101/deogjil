@@ -4,32 +4,26 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
   HttpCode,
   UseGuards,
   Req,
-  Res,
   Query,
-  BadRequestException,
-  UnauthorizedException,
   UseInterceptors,
   UploadedFile,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { KakaoAuthGuard } from './guards/kakao-auth.guard';
 import { UserService } from '../user/user.service';
 import { JwtRefreshAuthGuard } from './guards/jwtRefresh-auth.guard';
 import { RequestWithUserInterface } from './requestWithUser.interface';
-import { JwtAccessAuthGuard } from './guards/jwtAccess-auth.guard';
+
 import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '../user/entities/user.entity';
@@ -37,8 +31,8 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from '../common/utils/multer.options';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { JwtAccessAuthGuard } from './guards/jwtAccess-auth.guard';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -51,15 +45,15 @@ export class AuthController {
   @ApiCreatedResponse({
     description: 'the record has been success with user',
     type: User,
-  }) //성공시 응답을 해주겠다.
+  })
   async userSignup(@Body() createUserDto: CreateUserDto) {
     return await this.authService.createUser(createUserDto);
   }
 
   @Post('login')
   @ApiOperation({
-    summary: '로그인API',
-    description: '로그인해주는 api입니다 login',
+    summary: '로그인API!!!!!!!!!!!!!!!!!!',
+    description: '로그인해주는 api입니다 login!!!',
   })
   @ApiCreatedResponse({ description: '로그인함', type: User })
   @ApiBody({ type: LoginUserDto })
@@ -74,7 +68,6 @@ export class AuthController {
     req.res.setHeader('Set-Cookie', [refreshTokenCookie]);
 
     return { accessToken, user };
-    // return await this.authService.Login(loginUserDto);
   }
 
   @Get('profile')
@@ -83,10 +76,14 @@ export class AuthController {
   @ApiOperation({ summary: '프로필정보', description: '프로필정보 불러오기' })
   @UseGuards(JwtAccessAuthGuard)
   async getUserInfo(@Req() req: RequestWithUserInterface) {
-    const { user } = req;
-    const data = await this.authService.profile(user.id);
-    user.password = undefined;
-    return { data };
+    try {
+      const { user } = req;
+      const data = await this.authService.profile(user.id);
+      user.password = undefined;
+      return { data };
+    } catch (err) {
+      throw new UnauthorizedException('expired accesstoken');
+    }
   }
   @Patch()
   @ApiBearerAuth('access-token')
@@ -138,15 +135,18 @@ export class AuthController {
     return { accessToken, user };
   }
 
+  @Get('/refresh')
   @UseGuards(JwtRefreshAuthGuard)
-  @ApiBearerAuth('access-token')
-  @Get('refresh')
-  async refreshToken(@Req() req: RequestWithUserInterface) {
+  async refresh(@Req() req: RequestWithUserInterface) {
+    console.log('+++++++', req.user);
     const accessTokenCookie = await this.authService.generateAccessToken(
       req.user.id,
     );
-    req.res.setHeader('Set-Cookie', accessTokenCookie);
-    return req.user;
+    // Check if the access token is null or empty (if the refresh token is expired)
+    if (!accessTokenCookie) {
+      throw new UnauthorizedException('Expired RefreshToken');
+    }
+    return accessTokenCookie;
   }
 
   @UseGuards(JwtAccessAuthGuard)
@@ -155,6 +155,9 @@ export class AuthController {
   @HttpCode(200)
   async logOut(@Req() req: RequestWithUserInterface) {
     await this.userService.removeRefreshToken(req.user.id);
-    req.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
+    const token = req.headers['authorization'].split(' ')[1];
+    await this.authService.logout(token);
+    req.res.clearCookie('Refresh');
+    return 'logout';
   }
 }

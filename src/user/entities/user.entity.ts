@@ -115,7 +115,6 @@ export class User extends CommonEntity {
       const isPasswordMatch = await bcrypt.compare(aPassword, this.password);
       return isPasswordMatch;
     } catch (err) {
-      console.log(err);
       throw new HttpException(err.message, HttpStatus.CONFLICT);
     }
   }

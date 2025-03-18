@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSearchDto } from './dto/create-search.dto';
-import { UpdateSearchDto } from './dto/update-search.dto';
 import { ContentsService } from '../contents/contents.service';
 import { TalkcontentsService } from '../talkcontents/talkcontents.service';
 import { PageOptionsDto } from '../common/dtos/page-options.dto';

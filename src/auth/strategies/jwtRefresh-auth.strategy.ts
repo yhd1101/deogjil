@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -13,12 +13,12 @@ export class JwtRefreshAuthStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly userService: UserService,
+    private readonly usersService: UserService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
-          return req?.cookies?.Authentication;
+          return req?.cookies?.Refresh;
         },
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
@@ -28,11 +28,20 @@ export class JwtRefreshAuthStrategy extends PassportStrategy(
   }
 
   async validate(req: Request, payload: TokenPayloadInterface) {
-    console.log('!!!!!!!!', req);
     const refreshToken = req.cookies?.Refresh;
-    return this.userService.getUserIfRefreshTokenMatches(
+
+    // 검증 로직 추가
+    const isValid = await this.usersService.getUserIfRefreshTokenMatches(
       refreshToken,
       payload.userId,
     );
+
+    if (!isValid) {
+      req.res.clearCookie('Refresh');
+      throw new UnauthorizedException('Refresh token expired or invalid');
+    }
+
+    // 유효한 경우, 사용자 객체를 반환
+    return this.usersService.getUserById(payload.userId);
   }
 }
